@@ -10,28 +10,28 @@ GDIS machine is an abbreviation for Goals Database Index Stack machine.
 - Index is Pointer for Database.
 - Stack is stack data of Goals, unification substitution Environment and Index.
 
-## Future
+## Feature
 
-- :- prefix operator : 
+- :- prefix operator :
 - =/2 infix operator : unification
 - ,/2 infix operator : conjunction
 - ;/2 infix operator : 'or' predicate
-- !/0 infix operator : cut
-- is/2 infix operator : expression evalutes 
+- is/2 infix operator : expression evalutes
 - assert/1 predicate : add term to database
 - consult/1 predicate : load of file
 - halt/0 predicate : exit program
 - write/1 preicate : stdout output
+- !/0 predicate : cut
 
 ## Constitution
 
-- bjpl.pl カットはあるがスタックは増え続ける。
-- bjpl2.pl カットでスタックを消せるようにスタック長を別に持つ事にした。
-- bjpl3.pl prologのデータ構造をそのまま使いたいので、実験。
-- bjpl4.pl prologのデータ構造をそのまま使い、単一化もPrologの機能を使った。
-- bjpl5.pl 全ての組み込み関数をデータベースに入れる。
-- bjpl6.pl インデックスを命令リストにしてより抽象化する。
-- bjpl7.pl 組み込み述語の登録関数を作って短くする。
+- gdis.pl カットはあるがスタックは増え続ける。
+- gdis2.pl カットでスタックを消せるようにスタック長を別に持つ事にした。
+- gdis3.pl prologのデータ構造をそのまま使いたいので、実験。
+- gdis4.pl prologのデータ構造をそのまま使い、単一化もPrologの機能を使った。
+- gdis5.pl 全ての組み込み関数をデータベースに入れる。
+- gdis6.pl インデックスを命令リストにしてより抽象化する。
+- gdis7.pl 組み込み述語の登録関数を作って短くする。
 
 
 ## 考察
@@ -59,6 +59,9 @@ PrologによるPrologの実装では型やパーサを定義せずに実装出�
 また、実装したPrologでさらにPrologを実装出来る、いわゆるメタサーキュラーなインタプリタに出来るとよいでしょう。
 
 論理型言語で論理型言語を実装したので、より整理する事で、形式的に記述する事が出来るでしょう。
+
+- `take_integer`が動くかどうか調べる。
+- 操作的意味論などの論文をもっと調べる。
 
 ## Refarence
 
