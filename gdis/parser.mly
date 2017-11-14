@@ -47,8 +47,8 @@ exp:         | ATOM LPAREN exps RPAREN    { Pred($1, $3) }
              | STR                        { Str $1 }
              | LBRACKET listbody RBRACKET { $2 }
              | LPAREN term RPAREN         { $2 }
-exps:        | exp                        { [$1] }
-             | exp COMMA exps             { $1::$3 }
+exps:        | exp1                       { [$1] }
+             | exp1 COMMA exps            { $1::$3 }
 
 listbody:    | exps                       { list $1 (Atom "[]") }
              | exps OR var_or_list        { list $1 $3 }

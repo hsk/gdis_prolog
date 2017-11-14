@@ -1,19 +1,19 @@
 open Syntax
 open Prolog
 
-let welcome = "Beautiful Japanese Prolog Interpreter"
+let welcome = "GDIS Prolog Interpreter"
 
 let parse str =
   Parser.query Lexer.token (Lexing.from_string str)
 
 let help () =
   List.iter(fun (k,v) -> Printf.printf "%s\t%s\n%!" k v)
-  ["q","quit"; "l","list"; "h","help";]
+  ["e","exit"; "l","list"; "h","help";]
 
 let rec repl d =
     Printf.printf("? %!");
     match read_line () with
-    | "q"  -> ()
+    | "e"  -> ()
     | "l"  -> Array.iter (fun t -> Printf.printf "%s.\n%!" (Syntax.show t)) d; repl d
     | "h"  -> help (); repl d
     | "t"  -> trace := not !trace;

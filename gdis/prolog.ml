@@ -59,6 +59,12 @@ let uni m s t t2 =
   | Some e, (_::g, d, _, (sg, _,l, i)::s) -> Succ (g, d, -1, (sg, e, l, i) :: s)
   |      _,                           m -> pop m
 
+let uninot m s t t2 =
+	match unify (e s) t t2, m with
+	| Some _, m -> pop m
+	|      _, (_::g,d,_,s) -> Succ(g,d,-1,s)
+	|      _, ([],d,_,s) -> Fail d
+	
 let rec eval e = function
   | Number i -> i
   | Pred("+", [x;y]) -> (eval e x) +. (eval e y)
@@ -88,13 +94,14 @@ and solve m =
       i (String.concat "; " (List.map Syntax.show g)) (show (e s)) (List.length s);
     match m with
     |                      [], d,  i, s -> Succ m
-    |                       g, d, -2, s -> Fail d
+    |                       g, d, -2, s -> step(match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s)| m -> step m) 
     | Atom "halt"         ::g, d, -1, s -> exit 0
     | Atom "nop"          ::g, d, -1, s -> step (Succ(g,d,-1,s))
-    | Atom "!"            ::g, d, -1, (g2,e,l,_)::s -> step (Succ(g, d, -1, (g2, e,l, -2)::s))
+		| Atom "!"            ::g, d, -1, (g2,e,l,_)::s -> step (Succ(g, d, -1, (g2, e,l, -2)::s))
     | Pred(",",  [u;v])   ::g, d, -1, s -> step (Succ(u::v::g, d, -1, s))
     | Pred(";",  [u;v])   ::g, d, -1, s -> let e,l1=el1 s in step (Succ(   u::g, d, -1, (v::g, e,l1, -1)::s))
     | Pred("=",  [u;v])   ::g, d, -1, s -> step (uni m s u v)
+    | Pred("\=",  [u;v])  ::g, d, -1, s -> step (uninot m s u v)
     | Pred("is", [u;v])   ::g, d, -1, s -> step (uni m s u (Number(eval (e s) (deref (e s) v))))
     | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), i, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))

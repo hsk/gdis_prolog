@@ -10,13 +10,13 @@ object Parser extends RegexParsers {
     case x::xs     => Pred(".", List(x, list(xs, tail)))
   }
 
-  def ATOM     = """[a-z][a-zA-Z0-9_]*""".r
+  def ATOM     = """[a-z][a-zA-Z0-9_]*|'([^'\\]|\\')*'|!""".r
   def NUMBER   = """[0-9]+(\.[0-9]+)?""".r       ^^ { case a     => a.toFloat }
   def STR      = "\""~"""([^"\\]|\\.)*""".r~"\"" ^^ { case a~b~c => StringContext.treatEscapes(b) }
   def VAR      = """[A-Z][a-zA-Z0-9_]*""".r
   def OP3       = """[+\-]""".r
   def OP2       = """[*/]""".r
-  def OP1       = """=|is""".r
+  def OP1       = """=|is|\\=""".r
   def LPAREN   = "("
   def RPAREN   = ")"
   def LBRACKET = "["
