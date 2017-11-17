@@ -80,7 +80,11 @@ let rec assert1 d = function
   | t               -> Array.append d [| t |]
 
 and consult1 d t =
-  let filename = Syntax.show t in
+	let filename = match t with
+	| Atom a -> a
+	| Pred("library",[Atom t]) -> "/usr/share/gdispl/lib/" ^ t ^ ".pl"
+	| _ -> failwith "loading file path error"
+	in
   if !trace then Printf.printf "Loading %s\n" filename;
   let inp = open_in filename in
   let seq = Parser.seq Lexer.token (Lexing.from_channel inp) in

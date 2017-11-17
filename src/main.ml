@@ -23,7 +23,7 @@ let rec repl d =
               with Parsing.Parse_error -> Printf.printf "Syntax error\n%!"; repl d
 
 let () =
-  let db = ref (consult1 [||] (Atom "lib/initial.pl")) in (* load files *)
+  let db = ref (consult1 [||] (Pred("library",[Atom "initial"]))) in (* load files *)
   Arg.parse
     ["-t", Arg.Set trace, "trace";]
     (fun x -> db := consult1 !db (Atom x))

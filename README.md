@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.0.1
+# GDIS Prolog verion 0.0.2
 
 GDIS PrologはGoals Database Index Stackマシンとして実装したPrologの単純なインタプリンタです。
 
@@ -9,13 +9,21 @@ OCaml 版以外に, Scala, Prologで実装したPrologもあります。
 ```
 apt install ocaml
 make
-./gdispl test/eval3.pl
+sudo make install
+gdispl test/eval3.pl
+```
+
+# Uninstall
+
+```
+make uninstall
 ```
 
 # Change history
 
 ## 2017/11/17 version 0.0.2
 
+- make install make uninstall を追加しました。
 - OCaml版を正式に採用することにしてディレクトリ配置を変更しました。
 - TODOリストはissue listに移動させました。
 - develop ブランチを切ってそちらで開発を進めてから、masterにmergeすることにしました。
