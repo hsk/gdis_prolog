@@ -10,7 +10,13 @@ OCaml 版以外に, Scala, Prologで実装したPrologもあります。
 apt install ocaml
 make
 sudo make install
-gdispl test/eval3.pl
+```
+
+# Hello world
+
+```
+gdispl examples/hello.pl
+hello world
 ```
 
 # Uninstall
@@ -24,7 +30,8 @@ sudo make uninstall
 ## 2017/11/17 version 0.0.3
 
 - README を修正
-- labディレクトリに移動
+- Scala版とProlog版をlabディレクトリに移動
+- test ディレクトリ名を examples に変更
 
 ## 2017/11/17 version 0.0.2
 
