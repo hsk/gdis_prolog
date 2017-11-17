@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.0.2
+# GDIS Prolog verion 0.0.3
 
 GDIS PrologはGoals Database Index Stackマシンとして実装したPrologの単純なインタプリンタです。
 
@@ -16,10 +16,15 @@ gdispl test/eval3.pl
 # Uninstall
 
 ```
-make uninstall
+sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/17 version 0.0.3
+
+- README を修正
+- labディレクトリに移動
 
 ## 2017/11/17 version 0.0.2
 
