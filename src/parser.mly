@@ -11,7 +11,8 @@ let rec list args tail = match args with
 %start query %type <Syntax.t> query
 %%
 query:       | term DOT                   { $1 }
-seq:         | sentence                   { [$1] }
+seq:         | DOT seq                    { $2 }
+             | sentence                   { [$1] }
              | sentence seq               { $1::$2 }
 sentence:    | term DOT                   { Pred(":-", [$1; Atom "nop"]) }
              | IIF term DOT               { Pred(":-", [$2]) }

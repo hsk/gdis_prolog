@@ -1,28 +1,38 @@
-mem(E,(E;E1)).
-mem(E,(X;E1)) :- mem(E,E1).
+% Syntax
 
-mem(A=V,E)
-------------- (Var)
-eval(E,A,V)
+i(I) :- integer(I).
+e(A) :- i(A).
+e(E1+E2) :- e(E1),e(E2).
+e(E1*E2) :- e(E1),e(E2).
 
---------------------------- (Abs)
-eval(E,(X;A),(E;X;A))
+% Typing
 
-eval(E,A,(E1;X;A_))    eval(E,B,B_)
-eval((X=B_;E1),A_,A2)
--------------------------------------- (App)
-eval(E,(A,B),A2)
+integer(I)
+-------------------------------- (T-Int)
+typing(I,int)
 
-integer(A) !
------------- (Integer)
-eval(E,A,A)
+typing(E1,int)    typing(E2,int)
+-------------------------------- (T-Add)
+typing(E1+E2,int)
 
-eval(E,A,R1)    eval(E,B,R2)    R is R1 + R2
--------------------------------------------- (Add)
-eval(E,A+B,R)
+typing(E1,int)    typing(E2,int)
+-------------------------------- (T-Mul)
+typing(E1*E2,int)
 
-eval(E,A,R1)    eval(E,B,R2)    R is R1 * R2
--------------------------------------------- (Mul)
-eval(E,A*B,R)
+% Evaluation
 
-:- eval(0,(((a;b;a+b),1),2)*3,R),writeln(R),R=9,!,halt.
+integer(A)
+---------- (E-Int)
+eval(A,A)
+
+eval(A,R1) eval(B,R2) R is R1 + R2
+---------------------------------- (E-Add)
+eval(A+B,R)
+
+eval(A,R1) eval(B,R2) R is R1 * R2
+---------------------------------- (E-Add)
+eval(A*B,R)
+
+run(E,R) :- e(E), typing(E,int), eval(E,R).
+
+:- run(1+2*3,R),write(R),nl,!,halt.

@@ -10,8 +10,11 @@ install:
 	cp gdispl /usr/bin/
 uninstall:
 	rm -rf /usr/bin/gdispl /usr/share/gdispl
-
+test:
+	cd test; make test
 push:
 	make clean
 	git commit -a
 	git push
+
+.PHONY: test

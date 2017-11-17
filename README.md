@@ -1,12 +1,40 @@
-# GDIS Prolog verion 0.0.3
+# GDIS Prolog verion 0.0.4
 
-GDIS PrologはGoals Database Index Stackマシンとして実装したPrologの単純なインタプリンタです。
+GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
-OCaml 版以外に, Scala, Prologで実装したPrologもあります。
+GDIS とは Goals Database Index Stack の略です。
+インタプリタはゴール、データベース、インデックス、スタックの状態マシンとして構築されています。
+
+実装は非常にコンパクトですが、小さいながらも、インストールして気軽に使うことが出来ます。
+
+他の言語の作成にコントリビューションする際の、ドキュメントの整備や、貢献の仕方なども分かりやすくまとめたいと思います。
+
+VSCode プラグインを作るのも目標の１つです。
+
+## 特徴
+
+基本的には標準的なPrologを目指していますが、
+以下のように自然演繹スタイルの述語定義をサポートしています。
+
+```prolog
+integer(A)
+---------- (E-Int)
+eval(A,A)
+
+eval(A,R1) eval(B,R2) R is R1 + R2
+---------------------------------- (E-Add)
+eval(A+B,R)
+
+eval(A,R1) eval(B,R2) R is R1 * R2
+---------------------------------- (E-Add)
+eval(A*B,R)
+
+:- eval(1+2*3,R),write(R),nl,!,halt.
+```
 
 # Install
 
-```
+```bash
 apt install ocaml
 make
 sudo make install
@@ -14,7 +42,13 @@ sudo make install
 
 # Hello world
 
+examples/hello.pl
+
+```prolog
+:- writeln('hello world'),halt.
 ```
+
+```bash
 gdispl examples/hello.pl
 hello world
 ```
@@ -26,6 +60,15 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/17 version 0.0.4
+
+- README を修正
+- examples/eval3.pl を修正
+- examples/lambda.pl を追加
+- docs/README.md にBNF定義を追加
+- testファイルを追加
+- 空白行が続いた時の構文解析の仕様変更
 
 ## 2017/11/17 version 0.0.3
 
@@ -45,13 +88,3 @@ sudo make uninstall
 
 - 久しぶりに更新。 integer/1 述語を追加しました。
 - バージョン管理するようにしました。
-
-# gdis2pl
-
-Prologで作成したGDIS Prologです。
-
-単純に移植したものから、Prologの単一化機能とデータ型を利用したものまで複数の実装があります。
-
-# gdis2scala
-
-GDIS PrologのScalaバージョンです。
