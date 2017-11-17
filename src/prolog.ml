@@ -75,6 +75,11 @@ let rec eval e = function
 
 let write1 e t = Printf.printf "%s%!" (Syntax.show (deref e t))
 
+let call t g d i s = match List.map (fun t -> deref (e s) t) t with
+	| Atom a::ts -> Succ(Pred(a,ts)::g,d,i,s)
+	| Pred(a,ts1)::ts -> Succ(Pred(a,ts1@ts)::g,d,i,s)
+	| _ -> Fail(d)
+
 let rec assert1 d = function
   | Pred(":-", [t]) -> process d t
   | t               -> Array.append d [| t |]
@@ -98,7 +103,7 @@ and solve m =
       i (String.concat "; " (List.map Syntax.show g)) (show (e s)) (List.length s);
     match m with
     |                      [], d,  i, s -> Succ m
-    |                       g, d, -2, s -> step(match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s)| m -> step m) 
+    |                       g, d, -2, s -> step (match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s)| m -> step m) 
     | Atom "halt"         ::g, d, -1, s -> exit 0
     | Atom "nop"          ::g, d, -1, s -> step (Succ(g,d,-1,s))
 		| Atom "!"            ::g, d, -1, (g2,e,l,_)::s -> step (Succ(g, d, -1, (g2, e,l, -2)::s))
@@ -110,8 +115,9 @@ and solve m =
     | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), i, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))
     | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 d (deref (e s) t), i, s))
-		| Pred("integer", [t])::g, d, -1, s -> step(match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
-		| Pred("atom", [t])::g, d, -1, s -> step(match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
+		| Pred("integer", [t])::g, d, -1, s -> step (match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
+		| Pred("atom",    [t])::g, d, -1, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
+		| Pred("call",      t)::g, d, -1, s -> step (call t g d (-1) s)
 		|                       g, d, -1, s -> step (Succ(g, d, 0, s))
     |                    t::g, d,  i, s ->
       if i >= Array.length d then step (pop m) else

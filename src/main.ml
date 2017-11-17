@@ -1,7 +1,7 @@
 open Syntax
 open Prolog
 
-let welcome = "GDIS Prolog version 0.0.v"
+let welcome = "GDIS Prolog version 0.0.5"
 
 let parse str =
   Parser.query Lexer.token (Lexing.from_string str)

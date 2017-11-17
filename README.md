@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.0.4
+# GDIS Prolog verion 0.0.5
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
@@ -9,7 +9,7 @@ GDIS とは Goals Database Index Stack の略です。
 
 他の言語の作成にコントリビューションする際の、ドキュメントの整備や、貢献の仕方なども分かりやすくまとめたいと思います。
 
-VSCode プラグインを作るのも目標の１つです。
+VSCode プラグインを作るのも目標の１つです。簡単なPrologのプログラムをデバッグできれば便利なはずです。
 
 ## 特徴
 
@@ -61,6 +61,14 @@ sudo make uninstall
 
 # Change history
 
+## 2017/11/17 version 0.0.5
+
+- リストのライブラリを追加
+  - member/2 を追加
+  - call/1 を追加
+- [GDIS Prolog 仕様](https://github.com/hsk/gdis_prolog/blob/master/docs/README.md) を追加
+- [ライブラリリファレンス](https://github.com/hsk/gdis_prolog/blob/master/docs/library.md) を追加
+
 ## 2017/11/17 version 0.0.4
 
 - README を修正
@@ -88,3 +96,7 @@ sudo make uninstall
 
 - 久しぶりに更新。 integer/1 述語を追加しました。
 - バージョン管理するようにしました。
+
+## ライセンス
+
+MIT License

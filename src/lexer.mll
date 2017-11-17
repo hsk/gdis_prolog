@@ -25,6 +25,7 @@ rule token = parse
   | ")"                  { RPAREN }
   | "["                  { LBRACKET }
   | "]"                  { RBRACKET }
+  | "|"                  { OR }
   | "." ln2*             { DOT }
   | "!"                  { ATOM("!") }
   | ":-"                 { IIF }

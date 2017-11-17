@@ -1,6 +1,8 @@
 test:
 	gdispl comment.pl > result.txt && diff result.txt results/comment.txt
 	gdispl comment2.pl > result.txt && diff result.txt results/comment2.txt
+	gdispl call.pl > result.txt && diff result.txt results/call.txt
+	gdispl maplist.pl > result.txt && diff result.txt results/maplist.txt
 #	gdispl ../examples/a.pl > result.txt && diff result.txt results/a.txt
 	gdispl ../examples/cut.pl > result.txt && diff result.txt results/cut.txt
 	gdispl ../examples/eval2.pl > result.txt && diff result.txt results/eval2.txt
@@ -16,11 +18,14 @@ test:
 	gdispl ../examples/sum1.pl > result.txt && diff result.txt results/sum1.txt
 	gdispl ../examples/sum2.pl > result.txt && diff result.txt results/sum2.txt
 	gdispl ../examples/sum3.pl > result.txt && diff result.txt results/sum3.txt
+	gdispl ../examples/list.pl > result.txt && diff result.txt results/list.txt
 	rm -rf result.txt
 	@echo "test ok"
 mkresults:
 	gdispl comment.pl > results/comment.txt
 	gdispl comment2.pl > results/comment2.txt
+	gdispl call.pl > results/call.txt
+	gdispl maplist.pl > results/maplist.txt
 #	gdispl ../examples/a.pl > results/a.txt
 	gdispl ../examples/cut.pl > results/cut.txt
 	gdispl ../examples/eval2.pl > results/eval2.txt
@@ -36,6 +41,7 @@ mkresults:
 	gdispl ../examples/sum1.pl > results/sum1.txt
 	gdispl ../examples/sum2.pl > results/sum2.txt
 	gdispl ../examples/sum3.pl > results/sum3.txt
+	gdispl ../examples/list.pl > results/list.txt
 
 clean:
 	rm -rf result.txt
