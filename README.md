@@ -1,10 +1,25 @@
-## GDIS Prolog
+# GDIS Prolog verion 0.0.1
 
 GDIS PrologはGoals Database Index Stackマシンとして実装したPrologの単純なインタプリンタです。
 
-OCaml, Scala, Prologで実装したPrologがあります。
+OCaml 版以外に, Scala, Prologで実装したPrologもあります。
 
-## TODO
+# Install
+
+```
+apt install ocaml
+make
+./gdispl test/eval3.pl
+```
+
+# Change history
+
+## 2017/11/17 version 0.0.1 
+
+久しぶりに更新。 integer/1 述語を追加しました。
+バージョン管理するようにしました。
+
+# todo
 
 - [ ] `\` 演算子の実装
 - [ ] opの実装
@@ -16,12 +31,6 @@ OCaml, Scala, Prologで実装したPrologがあります。
 - [ ] DCGの実装
 - [ ] Scala版のOCaml追従
 - [ ] Prolog版のOCaml追従
-
-## gdis
-
-OCamlで作成したPrologです。
-
-ゴールズ、データベース、インデックス、スタック、マシンです。
 
 ## gdis2pl
 
