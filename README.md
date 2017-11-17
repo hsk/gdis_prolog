@@ -14,30 +14,23 @@ make
 
 # Change history
 
+## 2017/11/17 version 0.0.2
+
+- OCaml版を正式に採用することにしてディレクトリ配置を変更しました。
+- TODOリストはissue listに移動させました。
+- develop ブランチを切ってそちらで開発を進めてから、masterにmergeすることにしました。
+
 ## 2017/11/17 version 0.0.1 
 
-久しぶりに更新。 integer/1 述語を追加しました。
-バージョン管理するようにしました。
+- 久しぶりに更新。 integer/1 述語を追加しました。
+- バージョン管理するようにしました。
 
-# todo
-
-- [ ] `\` 演算子の実装
-- [ ] opの実装
-- [ ] リストの実装
-- [ ] memberの実装
-- [ ] maplistの実装
-- [ ] callの実装
-- [ ] foldlの実装
-- [ ] DCGの実装
-- [ ] Scala版のOCaml追従
-- [ ] Prolog版のOCaml追従
-
-## gdis2pl
+# gdis2pl
 
 Prologで作成したGDIS Prologです。
 
 単純に移植したものから、Prologの単一化機能とデータ型を利用したものまで複数の実装があります。
 
-## gdis2scala
+# gdis2scala
 
 GDIS PrologのScalaバージョンです。
