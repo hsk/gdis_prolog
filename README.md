@@ -32,6 +32,7 @@ sudo make uninstall
 - README を修正
 - Scala版とProlog版をlabディレクトリに移動
 - test ディレクトリ名を examples に変更
+- examples/eval3.pl を修正
 
 ## 2017/11/17 version 0.0.2
 
