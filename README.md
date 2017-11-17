@@ -4,6 +4,19 @@ GDIS PrologはGoals Database Index Stackマシンとして実装したPrologの�
 
 OCaml, Scala, Prologで実装したPrologがあります。
 
+## TODO
+
+- [ ] `\` 演算子の実装
+- [ ] opの実装
+- [ ] リストの実装
+- [ ] memberの実装
+- [ ] maplistの実装
+- [ ] callの実装
+- [ ] foldlの実装
+- [ ] DCGの実装
+- [ ] Scala版のOCaml追従
+- [ ] Prolog版のOCaml追従
+
 ## gdis
 
 OCamlで作成したPrologです。

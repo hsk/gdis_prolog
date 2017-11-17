@@ -1,7 +1,7 @@
 open Syntax
 open Prolog
 
-let welcome = "GDIS Prolog Interpreter"
+let welcome = "GDIS Prolog version 0.0.1"
 
 let parse str =
   Parser.query Lexer.token (Lexing.from_string str)
@@ -11,7 +11,7 @@ let help () =
   ["e","exit"; "l","list"; "h","help";]
 
 let rec repl d =
-    Printf.printf("? %!");
+    Printf.printf("?- %!");
     match read_line () with
     | "e"  -> ()
     | "l"  -> Array.iter (fun t -> Printf.printf "%s.\n%!" (Syntax.show t)) d; repl d

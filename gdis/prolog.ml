@@ -101,12 +101,14 @@ and solve m =
     | Pred(",",  [u;v])   ::g, d, -1, s -> step (Succ(u::v::g, d, -1, s))
     | Pred(";",  [u;v])   ::g, d, -1, s -> let e,l1=el1 s in step (Succ(   u::g, d, -1, (v::g, e,l1, -1)::s))
     | Pred("=",  [u;v])   ::g, d, -1, s -> step (uni m s u v)
-    | Pred("\=",  [u;v])  ::g, d, -1, s -> step (uninot m s u v)
+    | Pred("\\=",  [u;v]) ::g, d, -1, s -> step (uninot m s u v)
     | Pred("is", [u;v])   ::g, d, -1, s -> step (uni m s u (Number(eval (e s) (deref (e s) v))))
     | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), i, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))
     | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 d (deref (e s) t), i, s))
-    |                       g, d, -1, s -> step (Succ(g, d, 0, s))
+		| Pred("integer", [t])::g, d, -1, s -> step(match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
+		| Pred("atom", [t])::g, d, -1, s -> step(match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
+		|                       g, d, -1, s -> step (Succ(g, d, 0, s))
     |                    t::g, d,  i, s ->
       if i >= Array.length d then step (pop m) else
       match d.(i) with
@@ -129,13 +131,18 @@ and solve m =
   )
 
 and process d t =
-  let rec prove m = match solve m with
-    | Fail d -> Printf.printf "No.\n"; d
-    | Succ (g, d, i, s as m) ->
-      Printf.printf "%s\n" (show (e s));
-      if s = [] || i = -2 then (Printf.printf "Yes.\n"; d) else (
-        Printf.printf "More y/n";
-        if "y" = read_line () then prove m else d
-      )
-  in prove ([t], d, -1, [[],[],1,-2])
+  let rec prove f m = match solve m with
+    | Fail d -> Printf.printf "false\n"; d
+		| Succ (g, d, i, s as m) ->
+			if f || show (e s) <>"" && ";" = read_line () then (
+				if(show(e s)<>"") then Printf.printf "%s%!" (show (e s));
+				if i = -2 then (Printf.printf "false\n"; d) else
+				if s = [] then (Printf.printf "\ntrue\n"; d) else (
+					prove false m
+				)
+			) else (
+				if not f then Printf.printf "true\n";
+				d
+			)
+  in prove true ([t], d, -1, [[],[],1,-2])
 
