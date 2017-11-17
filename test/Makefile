@@ -3,6 +3,7 @@ test:
 	gdispl comment2.pl > result.txt && diff result.txt results/comment2.txt
 	gdispl call.pl > result.txt && diff result.txt results/call.txt
 	gdispl maplist.pl > result.txt && diff result.txt results/maplist.txt
+	gdispl foldl.pl > result.txt && diff result.txt results/foldl.txt
 #	gdispl ../examples/a.pl > result.txt && diff result.txt results/a.txt
 	gdispl ../examples/cut.pl > result.txt && diff result.txt results/cut.txt
 	gdispl ../examples/eval2.pl > result.txt && diff result.txt results/eval2.txt
@@ -26,6 +27,7 @@ mkresults:
 	gdispl comment2.pl > results/comment2.txt
 	gdispl call.pl > results/call.txt
 	gdispl maplist.pl > results/maplist.txt
+	gdispl foldl.pl > results/foldl.txt
 #	gdispl ../examples/a.pl > results/a.txt
 	gdispl ../examples/cut.pl > results/cut.txt
 	gdispl ../examples/eval2.pl > results/eval2.txt

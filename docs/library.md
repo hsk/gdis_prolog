@@ -60,3 +60,12 @@ example
 
     double_triple(A,B,C) :- B is A * 2, C is A * 3.
     :- maplist(double_triple,[1,2,3],[2,4,6],[3,6,9]),halt.
+
+# foldl/4
+
+リストの畳込みを行います。
+
+example
+
+    add(A,B,C) :- C is A + B.
+    :- foldl(add,0,[1,2,3],6),halt.

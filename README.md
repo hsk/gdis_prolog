@@ -66,6 +66,8 @@ sudo make uninstall
 - リストのライブラリを追加
   - member/2 を追加
   - call/1 を追加
+  - maplist/2,maplist/3,maplist/4 を追加
+  - foldl/4 を追加
 - [GDIS Prolog 仕様](https://github.com/hsk/gdis_prolog/blob/master/docs/README.md) を追加
 - [ライブラリリファレンス](https://github.com/hsk/gdis_prolog/blob/master/docs/library.md) を追加
 
