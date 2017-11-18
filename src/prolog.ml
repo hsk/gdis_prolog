@@ -94,6 +94,9 @@ and consult1 d t =
   let inp = open_in filename in
   let seq = Parser.seq Lexer.token (Lexing.from_channel inp) in
   List.fold_left assert1 d seq
+and not1 g d s = function
+	| Fail d -> Succ(g,d,-1,s)
+	| Succ(_,_,_,_) -> Fail d
 
 and solve m =
   let rec step = function
@@ -110,7 +113,8 @@ and solve m =
     | Pred(",",  [u;v])   ::g, d, -1, s -> step (Succ(u::v::g, d, -1, s))
     | Pred(";",  [u;v])   ::g, d, -1, s -> let e,l1=el1 s in step (Succ(   u::g, d, -1, (v::g, e,l1, -1)::s))
     | Pred("=",  [u;v])   ::g, d, -1, s -> step (uni m s u v)
-    | Pred("\\=",  [u;v]) ::g, d, -1, s -> step (uninot m s u v)
+    | Pred("\\=", [u;v])  ::g, d, -1, s -> step (uninot m s u v)
+    | Pred("\\", [u])     ::g, d, -1, s -> step (not1 g d s (step(Succ([u], d, -1, []))))
     | Pred("is", [u;v])   ::g, d, -1, s -> step (uni m s u (Number(eval (e s) (deref (e s) v))))
     | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), i, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))

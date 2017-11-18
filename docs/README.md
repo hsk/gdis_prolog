@@ -4,7 +4,7 @@
 
 - [ライブラリリファレンス](library.md) を参照してください。
 
-# BNF (version 0.0.4時点)
+# EBNF (version 0.0.4時点)
 
 Lexical Syntax
 
@@ -19,6 +19,7 @@ number      ::= digit+ ('.' digit+)?
 str         ::= ([^ '"' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '"'])*
 satom       ::= ([^ '\'' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '\''])*
 op          ::= ";" | "," | "=" | "is" | "+" | "-" | "*" | "/" | "\\="
+pre         ::= "\\"
 com         ::= [' ' '\t']* '(' [^ ')']* ')'
 ln          ::= ('\r' '\n') | '\r' | '\n'
 ln2         ::= [' ' '\t']* ln [' ' '\t']*
@@ -57,6 +58,7 @@ exp        ::= ATOM "(" exps ")"
              | STR
              | "[" listbody "]"
              | "(" term ")"
+             | pre exp
 exps       ::= /* empty */
              | exp1
              | exp1 "," exps

@@ -4,7 +4,7 @@ let rec list args tail = match args with
   | []    -> tail
   | x::xs -> Pred(".", [x; list xs tail])
 %}
-%token <float> NUMBER %token <string> ATOM STR VAR OP
+%token <float> NUMBER %token <string> ATOM STR VAR OP PRE
 %token LPAREN RPAREN LBRACKET RBRACKET DOT OR SEMI COMMA LINE IIF EOF
 %right IIF %right COMMA %right OP
 %start seq %type <Syntax.t list> seq
@@ -33,6 +33,7 @@ exp:         | ATOM LPAREN exps RPAREN    { Pred($1, $3) }
              | STR                        { Str $1 }
              | LBRACKET listbody RBRACKET { $2 }
              | LPAREN term RPAREN         { $2 }
+             | PRE exp                    { Pred($1, [$2]) }
 exps:        | /* empty */                { [] }
              | exp1                       { [$1] }
              | exp1 COMMA exps            { $1::$3 }

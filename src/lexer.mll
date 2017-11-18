@@ -30,6 +30,7 @@ rule token = parse
   | "!"                  { ATOM("!") }
   | ":-"                 { IIF }
   | '-' '-'+ com?        { LINE }
+  | "\\"                 { PRE "\\" }
   | op     as s          { OP s }
   | atom   as s          { ATOM s }
   | var    as s          { VAR s }
