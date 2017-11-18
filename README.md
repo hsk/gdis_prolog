@@ -63,7 +63,7 @@ sudo make uninstall
 
 ## 2017/11/18 version 0.0.6
 
-- '\'/1 を追加
+- '\\'/1 を追加
 
 ## 2017/11/17 version 0.0.5
 
