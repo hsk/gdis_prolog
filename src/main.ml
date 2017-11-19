@@ -1,7 +1,7 @@
 open Syntax
 open Prolog
 
-let welcome = "GDIS Prolog version 0.0.5"
+let welcome = "GDIS Prolog version 0.0.7"
 
 let parse str =
   Parser.query Lexer.token (Lexing.from_string str)
@@ -27,7 +27,8 @@ let () =
   Arg.parse
     ["-t", Arg.Set trace, "trace";]
     (fun x -> db := consult1 !db (Atom x))
-    "Usage: bpij [-t] filename1 filename2 ...";
+		"Usage: bpij [-t] filename1 filename2 ...";
+	interactive := true;
   Printf.printf "%s\n%!" (String.make (String.length welcome) '-');
   Printf.printf "%s\n%!" welcome;
   Printf.printf "%s\n%!" (String.make (String.length welcome) '-');

@@ -41,7 +41,7 @@ type m = g * d * i * s      (* gdis machine *)
 
 type ('a, 'b) res = Fail of 'a | Succ of 'b
 let trace = ref false
-
+let interactive = ref false
 let e s = match s with
   | [] -> []
   | (_, e, _, _)::_ -> e
@@ -151,11 +151,11 @@ and process d t =
 			if f || show (e s) <>"" && ";" = read_line () then (
 				if(show(e s)<>"") then Printf.printf "%s%!" (show (e s));
 				if i = -2 then (Printf.printf "false\n"; d) else
-				if s = [] then (Printf.printf "\ntrue\n"; d) else (
+				if s = [] then (if !interactive then Printf.printf "\ntrue\n"; d) else (
 					prove false m
 				)
 			) else (
-				if not f then Printf.printf "true\n";
+				if not f && !interactive then Printf.printf "true\n";
 				d
 			)
   in prove true ([t], d, -1, [[],[],1,-2])

@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.0.6
+# GDIS Prolog verion 0.0.7
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
@@ -60,6 +60,10 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/18 version 0.0.7
+
+- 複数の:-/1述語で問題なく動作するように
 
 ## 2017/11/18 version 0.0.6
 
