@@ -64,6 +64,11 @@ sudo make uninstall
 ## 2017/11/18 version 0.0.7
 
 - 複数の:-/1述語で問題なく動作するように
+- nop/0 を true/0 に変更
+- forall/2 を追加
+- retract/1 を追加
+- retractall/1 を追加
+- リスト表示バグ修正
 
 ## 2017/11/18 version 0.0.6
 

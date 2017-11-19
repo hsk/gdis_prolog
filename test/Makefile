@@ -6,6 +6,8 @@ test:
 	gdispl foldl.pl > result.txt && diff result.txt results/foldl.txt
 	gdispl not.pl > result.txt && diff result.txt results/not.txt
 	gdispl sequence.pl > result.txt && diff result.txt results/sequence.txt
+	gdispl forall.pl > result.txt && diff result.txt results/forall.txt
+	gdispl findall.pl > result.txt && diff result.txt results/findall.txt
 #	gdispl ../examples/a.pl > result.txt && diff result.txt results/a.txt
 	gdispl ../examples/cut.pl > result.txt && diff result.txt results/cut.txt
 	gdispl ../examples/eval2.pl > result.txt && diff result.txt results/eval2.txt
@@ -32,6 +34,8 @@ mkresults:
 	gdispl foldl.pl > results/foldl.txt
 	gdispl not.pl > results/not.txt
 	gdispl sequence.pl > results/sequence.txt
+	gdispl forall.pl > results/forall.txt
+	gdispl findall.pl > results/findall.txt
 #	gdispl ../examples/a.pl > results/a.txt
 	gdispl ../examples/cut.pl > results/cut.txt
 	gdispl ../examples/eval2.pl > results/eval2.txt

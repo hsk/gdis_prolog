@@ -14,9 +14,9 @@ query:       | term DOT                   { $1 }
 seq:         | DOT seq                    { $2 }
              | sentence                   { [$1] }
              | sentence seq               { $1::$2 }
-sentence:    | term DOT                   { Pred(":-", [$1; Atom "nop"]) }
+sentence:    | term DOT                   { Pred(":-", [$1; Atom "true"]) }
              | IIF term DOT               { Pred(":-", [$2]) }
-             | LINE term DOT              { Pred(":-", [$2; Atom "nop"]) }
+             | LINE term DOT              { Pred(":-", [$2; Atom "true"]) }
              | term LINE term DOT         { Pred(":-", [$3; $1]) }
              | term IIF term DOT          { Pred(":-", [$1; $3]) }
 term:        | term1 SEMI term            { Pred(";", [$1; $3]) }

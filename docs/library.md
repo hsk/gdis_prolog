@@ -6,7 +6,7 @@
 
   プログラムを終了する述語です。
 
-# nop/0
+# true/0
 
   何もしません。
 
@@ -83,3 +83,27 @@ example
 
     add(A,B,C) :- C is A + B.
     :- foldl(add,0,[1,2,3],6),halt.
+
+# forall/2
+
+第一パラメータがtrueになるすべてのパターンで第二パラメータを実行します。
+
+example
+
+    name(test).
+    name(hoge).
+    name(fuga).
+    :- forall(name(A),writeln(A)).
+    :- halt.
+
+# findall/3
+
+第二パラメータがtrueになるすべてのパターンを取り出し第一パラメータのリストとして第三パラメータに返します。
+
+example
+
+    name(test).
+    name(hoge).
+    name(fuga).
+    :- findall(A,name(A),R),maplist(writeln,R).
+    :- halt.

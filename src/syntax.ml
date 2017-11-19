@@ -18,6 +18,6 @@ let rec show = function
 
 and show_list = function
   | Pred(".", [t; Atom("[]")])         -> show t
-  | Pred(".", [t;(Pred(".", _) as u)]) -> show t ^ show_list u
+  | Pred(".", [t;(Pred(".", _) as u)]) -> show t ^ "," ^ show_list u
   | Pred(".", [t;u])                   -> show t ^ "|" ^ show u
   | t                                  -> show t

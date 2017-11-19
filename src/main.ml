@@ -10,11 +10,11 @@ let help () =
   List.iter(fun (k,v) -> Printf.printf "%s\t%s\n%!" k v)
   ["e","exit"; "l","list"; "h","help";]
 
-let rec repl d =
+let rec repl (d:(Syntax.t * int) array) =
     Printf.printf("?- %!");
     match read_line () with
     | "e"  -> ()
-    | "l"  -> Array.iter (fun t -> Printf.printf "%s.\n%!" (Syntax.show t)) d; repl d
+    | "l"  -> Array.iter (fun (t,_) -> Printf.printf "%s.\n%!" (Syntax.show t)) d; repl d
     | "h"  -> help (); repl d
     | "t"  -> trace := not !trace;
               Printf.printf "Tracing %s.\n%!" (if !trace then "on" else "off");
@@ -23,7 +23,7 @@ let rec repl d =
               with Parsing.Parse_error -> Printf.printf "Syntax error\n%!"; repl d
 
 let () =
-  let db = ref (consult1 [||] (Pred("library",[Atom "initial"]))) in (* load files *)
+  let db = ref (consult1 (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
   Arg.parse
     ["-t", Arg.Set trace, "trace";]
     (fun x -> db := consult1 !db (Atom x))

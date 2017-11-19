@@ -79,11 +79,41 @@ let call t g d i s = match List.map (fun t -> deref (e s) t) t with
 	| Atom a::ts -> Succ(Pred(a,ts)::g,d,i,s)
 	| Pred(a,ts1)::ts -> Succ(Pred(a,ts1@ts)::g,d,i,s)
 	| _ -> Fail(d)
-
+let to_db = function
+	| Pred(":-",[_;_]) as t -> t
+	| t               -> Pred(":-",[t;Atom "true"])
+let retract1 d t e =
+	let t = to_db t in
+	Db.retract d (fun dt ->
+		match dt,t with
+		| (Pred(":-",[dt;_]),Pred(":-",[t;_])) ->
+			(match unify e t dt with Some _ -> true | None -> false)
+		| _ -> false
+	)
+let retractall d t e =
+	let t = to_db t in
+	Db.retractall d (fun dt ->
+		match dt,t with
+		| (Pred(":-",[dt;_]),Pred(":-",[t;_])) ->
+			(match unify e t dt with Some _ -> true | None -> false)
+		| _ -> false
+	)
+	
+let retractz d t e =
+	let t = to_db t in
+	Db.retractz d (fun dt ->
+		match dt,t with
+		| (Pred(":-",[dt;_]),Pred(":-",[t;_])) ->
+			(match unify e t dt with Some _ -> true | None -> false)
+		| _ -> false
+	)
+			
 let rec assert1 d = function
   | Pred(":-", [t]) -> process d t
-  | t               -> Array.append d [| t |]
-
+	| t               -> Db.assert1 d (to_db t)
+and asserta d = function
+	| Pred(":-", [t]) -> process d t
+	| t               -> Db.asserta d (to_db t)
 and consult1 d t =
 	let filename = match t with
 	| Atom a -> a
@@ -96,8 +126,7 @@ and consult1 d t =
   List.fold_left assert1 d seq
 and not1 g d s = function
 	| Fail d -> Succ(g,d,-1,s)
-	| Succ(_,_,_,_) -> Fail d
-
+	| Succ(_,_,_,_) -> Fail d	
 and solve m =
   let rec step = function
   | Fail d     -> Fail d
@@ -108,7 +137,7 @@ and solve m =
     |                      [], d,  i, s -> Succ m
     |                       g, d, -2, s -> step (match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s)| m -> step m) 
     | Atom "halt"         ::g, d, -1, s -> exit 0
-    | Atom "nop"          ::g, d, -1, s -> step (Succ(g,d,-1,s))
+    | Atom "true"         ::g, d, -1, s -> step (Succ(g,d,-1,s))
 		| Atom "!"            ::g, d, -1, (g2,e,l,_)::s -> step (Succ(g, d, -1, (g2, e,l, -2)::s))
     | Pred(",",  [u;v])   ::g, d, -1, s -> step (Succ(u::v::g, d, -1, s))
     | Pred(";",  [u;v])   ::g, d, -1, s -> let e,l1=el1 s in step (Succ(   u::g, d, -1, (v::g, e,l1, -1)::s))
@@ -116,17 +145,21 @@ and solve m =
     | Pred("\\=", [u;v])  ::g, d, -1, s -> step (uninot m s u v)
     | Pred("\\", [u])     ::g, d, -1, s -> step (not1 g d s (step(Succ([u], d, -1, []))))
     | Pred("is", [u;v])   ::g, d, -1, s -> step (uni m s u (Number(eval (e s) (deref (e s) v))))
-    | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), i, s))
+    | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), -1, s))
+    | Pred("asserta",  [t])::g, d, -1, s -> step (Succ(g, asserta d (deref (e s) t), -1, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))
+    | Pred("retract", [t])::g, d, -1, s -> step (Succ(g,retract1 d t (e s),-1,s))
+    | Pred("retractz", [t])::g, d, -1, s -> step (Succ(g,retractz d t (e s),-1,s))
+    | Pred("retractall", [t])::g, d, -1, s -> step (Succ(g,retractall d t (e s),-1,s))
     | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 d (deref (e s) t), i, s))
 		| Pred("integer", [t])::g, d, -1, s -> step (match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("atom",    [t])::g, d, -1, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("call",      t)::g, d, -1, s -> step (call t g d (-1) s)
-		|                       g, d, -1, s -> step (Succ(g, d, 0, s))
-    |                    t::g, d,  i, s ->
-      if i >= Array.length d then step (pop m) else
+		|                       g, d, -1, s -> step (Succ(g, d, Db.get_start d, s))
+		|                    t::g, d,  i, s ->
+      if i==0 then step (pop m) else
       match d.(i) with
-      | Pred(":-", [t2; t3]) ->
+      | (Pred(":-", [t2; t3]),nx) ->
         let e,l1 = el1 s in
         let rec gen_t = function
           | Pred(n, ts) -> Pred(n, List.map (fun a -> gen_t a) ts)
@@ -134,10 +167,11 @@ and solve m =
           | t -> t
         in
         begin match unify e t (gen_t t2) with
-        | None   -> step (Succ(       t::g, d, i + 1, s))
-        | Some e -> step (Succ(gen_t t3::g, d,    -1, (t::g, e, l1, i+1) :: s))
+        | None   -> step (Succ(       t::g, d, nx, s))
+        | Some e -> step (Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s))
         end
-      | t -> Printf.printf "Database is broken. %s\n" (Syntax.show t); Fail d
+			| (_,nx) -> step(Succ(t::g,d,nx,s))
+			| (t,_) -> Printf.printf "Database is broken. %s\n" (Syntax.show t); Fail d
   in
   step (match m with
     | [], _, _, _ -> pop m
@@ -149,7 +183,7 @@ and process d t =
     | Fail d -> Printf.printf "false\n"; d
 		| Succ (g, d, i, s as m) ->
 			if f || show (e s) <>"" && ";" = read_line () then (
-				if(show(e s)<>"") then Printf.printf "%s%!" (show (e s));
+				if(!interactive && show(e s)<>"") then Printf.printf "%s%!" (show (e s));
 				if i = -2 then (Printf.printf "false\n"; d) else
 				if s = [] then (if !interactive then Printf.printf "\ntrue\n"; d) else (
 					prove false m
