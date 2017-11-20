@@ -1,3 +1,9 @@
+gdis-prolog (0.0.9) zesty; urgency=medium
+
+  * test 
+
+ -- sakurai <sakurai777@gmail.com>  Mon, 20 Nov 2017 16:46:48 +0900
+
 gdis-prolog (0.0.8) zesty; urgency=medium
 
   * added package files 
