@@ -23,11 +23,15 @@ let rec repl (d:(Syntax.t * int) array) =
               with Parsing.Parse_error -> Printf.printf "Syntax error\n%!"; repl d
 
 let () =
-  let db = ref (consult1 (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
+	let files = ref [] in
   Arg.parse
-    ["-t", Arg.Set trace, "trace";]
-    (fun x -> db := consult1 !db (Atom x))
-		"Usage: bpij [-t] filename1 filename2 ...";
+    ["-t", Arg.Set trace, "trace";"-lib", Arg.Set_string libpath, "<libpath> set libraries path";]
+    (fun x -> files := !files @ [x])
+		"Usage: gdispl <options> filename1 filename2 ...\noptions are:";
+	let db = ref (consult1 (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
+	!files|> List.iter(fun x ->
+		db := consult1 !db (Atom x)
+	);
 	interactive := true;
   Printf.printf "%s\n%!" (String.make (String.length welcome) '-');
   Printf.printf "%s\n%!" welcome;

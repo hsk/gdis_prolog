@@ -4,7 +4,7 @@ all:
 clean:
 	cd src; make clean
 	rm -rf gdispl
-install:
+install_:
 	mkdir -p /usr/share/gdispl/
 	cp -rf lib /usr/share/gdispl/
 	cp gdispl /usr/bin/
@@ -20,7 +20,9 @@ push:
 	git push
 dev:
 	make
-	sudo make install
+	sudo make install_
 	make test
-
+ppa:
+	sudo dpkg-buildpackage -us -uc
+	sudo pbuilder --build ../gdis-prolog_0.0.7.dsc
 .PHONY: test
