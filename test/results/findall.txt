@@ -1,1 +1,1 @@
-false
+[fuga,hoge,test]

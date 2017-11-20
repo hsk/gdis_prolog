@@ -33,6 +33,7 @@ let new_free (db:db) p n : (int * db) =
 	let free = get_free db in
 	if free = 0 then (Array.length db,Array.append db [|p,n|])
 	else ((* フリーデータを１つ取り出し繋ぎ変えます。 *)
+		failwith "error use free datas";
 		db.(0) <- (fst db.(0), snd db.(free));
 		db.(free) <- (p,n);
 		(free,(db:db))
@@ -55,24 +56,18 @@ let assert1 (db:db) p =
 	db
 
 (* 指定インデックスを削除 *)
-let remove db i n =
-	db.(i) <- (fst db.(i), snd db.(n));
-	db.(n) <- (Atom "free",snd db.(0));
-	db.(0) <- (fst db.(0), n);
-	db.(2) <- (fst db.(2), i);
+let remove db n =
+	db.(n) <- (Number (float_of_int (snd db.(0))), snd db.(n));
+	db.(0) <- (Number (float_of_int n), snd db.(0));
 	db
 (* dbの手前から１つ削除 *)
 let retract db (f:Syntax.t->bool) =
-	(*dump db;*)
 	let rec loop i db =
-		if i = 0 || Array.length db <= i then db else
-		match db.(i) with
-		| (_,0) -> db
-		| (_,n) when f (fst db.(n)) -> remove db i n
-		| (_,n) -> loop n db
+		if i = 0 then db else
+		let (t,n) = db.(i) in
+		if f t then remove db i else loop n db
 	in
 	let db = loop (get_start db) db in
-	(*dump db;*)
 	db
 	(* fがtrueを返すデータをみつけて１つ消す*)
 
