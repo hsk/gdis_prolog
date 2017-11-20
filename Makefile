@@ -23,6 +23,13 @@ dev:
 	sudo make install_
 	make test
 ppa:
-	sudo dpkg-buildpackage -us -uc
+	debuild -S -sa 
 	sudo pbuilder --build ../gdis-prolog_0.0.7.dsc
+up:
+
+	rm -rf ../gdis-prolog_0.0.7*
+	#debuild -S
+	debuild -S -sa 
+	dput -f gdis-prolog  ../gdis-prolog_0.0.7_source.changes 
+
 .PHONY: test

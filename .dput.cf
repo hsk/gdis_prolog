@@ -1,7 +1,7 @@
 [gdis_prolog-ppa]
 fqdn = ppa.launchpad.net
 method = ftp
-incoming = ~h-sakurai/ppa/ubuntu
+incoming = ~h-sakurai/ubuntu
 login = anonymous
 allow_unsigned_uploads = 0
 

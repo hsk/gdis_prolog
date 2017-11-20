@@ -1,5 +1,5 @@
-gdis-prolog (0.0.7) unstable; urgency=medium
+gdis-prolog (0.0.7) zesty; urgency=medium
 
-  * Initial Release.
+  * Initial release.
 
- -- sakurai <sakurai777@gmail.com>  Mon, 20 Nov 2017 11:46:06 +0900
+ -- sakurai <sakurai777@gmail.com>  Mon, 20 Nov 2017 15:34:17 +0900
