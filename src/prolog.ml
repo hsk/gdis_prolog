@@ -122,9 +122,13 @@ and consult1 d t =
 	| _ -> failwith "loading file path error"
 	in
   if !trace then Printf.printf "Loading %s\n" filename;
-  let inp = open_in filename in
-  let seq = Parser.seq Lexer.token (Lexing.from_channel inp) in
-  List.fold_left assert1 d seq
+	let inp = open_in filename in
+	let lexer = Lexing.from_channel inp in
+	let rec loop d =
+		match Parser.sentence Lexer.token lexer with
+		| Atom _ -> d
+		| p -> loop (assert1 d p)
+	in loop d
 and not1 g d s = function
 	| Fail d -> Succ(g,d,-1,s)
 	| Succ(_,_,_,_) -> Fail d	

@@ -5,20 +5,16 @@ let rec list args tail = match args with
   | x::xs -> Pred(".", [x; list xs tail])
 %}
 %token <float> NUMBER %token <string> ATOM STR VAR OP PRE
-%token LPAREN RPAREN LBRACKET RBRACKET DOT OR SEMI COMMA LINE IIF EOF
+%token LPAREN RPAREN LBRACKET RBRACKET DOT OR SEMI COMMA IIF EOF
 %right IIF %right COMMA %right OP
-%start seq %type <Syntax.t list> seq
+%start sentence %type <Syntax.t> sentence
 %start query %type <Syntax.t> query
 %%
 query:       | term DOT                   { $1 }
-seq:         | DOT seq                    { $2 }
-             | sentence                   { [$1] }
-             | sentence seq               { $1::$2 }
 sentence:    | term DOT                   { Pred(":-", [$1; Atom "true"]) }
              | IIF term DOT               { Pred(":-", [$2]) }
-             | LINE term DOT              { Pred(":-", [$2; Atom "true"]) }
-             | term LINE term DOT         { Pred(":-", [$3; $1]) }
              | term IIF term DOT          { Pred(":-", [$1; $3]) }
+             | EOF                        { Atom ("false") }
 term:        | term1 SEMI term            { Pred(";", [$1; $3]) }
              | term1                      { $1 }
 term1:       | exp1 COMMA term1           { Pred(",", [$1; $3]) }

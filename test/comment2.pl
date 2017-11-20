@@ -2,7 +2,7 @@
 
 integer(I)
 --------------
-i(I)
+i(I) :- integer(I)
 
 
 

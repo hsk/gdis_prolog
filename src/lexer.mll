@@ -14,10 +14,8 @@ let satom = ([^ '\'' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '\''])*
 let op = ";" | "," | "=" | "is" | "+" | "-" | "*" | "/" | "\\="
 let com = [' ' '\t']* '(' [^ ')']* ')'
 let ln = ('\r' '\n') | '\r' | '\n'
-let ln2 = [' ' '\t']* ln [' ' '\t']*
 rule token = parse
   | [' ' '\t']           { token lexbuf }
-  | ln2 ln2+ '.'? ln2*   { DOT }
   | ln                   { token lexbuf }
   | ";"                  { SEMI }
   | ","                  { COMMA }
@@ -26,10 +24,9 @@ rule token = parse
   | "["                  { LBRACKET }
   | "]"                  { RBRACKET }
   | "|"                  { OR }
-  | "." ln2*             { DOT }
+  | "."                  { DOT }
   | "!"                  { ATOM("!") }
   | ":-"                 { IIF }
-  | '-' '-'+ com?        { LINE }
   | "\\"                 { PRE "\\" }
   | op     as s          { OP s }
   | atom   as s          { ATOM s }
@@ -37,6 +34,6 @@ rule token = parse
   | number as s          { NUMBER (float_of_string s) }
   | '"' (str as s) '"'   { STR (Scanf.unescaped s) }
   | "'" (satom as s) "'" { ATOM (Scanf.unescaped s) }
-  | eof                  { EOF }
   | "%" nonendl          { token lexbuf }
+  | eof                  { EOF }
   | _                    { token lexbuf }

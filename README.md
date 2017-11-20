@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.0
+# GDIS Prolog verion 0.1.1
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
@@ -71,6 +71,10 @@ sudo make uninstall
 
 # Change history
 
+## 2017/11/20 version 0.1.1
+
+- 演算子の優先順位を変更可能にするために独自拡張機能を一旦なくしました。
+
 ## 2017/11/20 version 0.1.0
 
 Ubuntu 17.04 で以下のコマンドでインストールできるようになりました。
@@ -80,8 +84,6 @@ sudo add-apt-repository ppa:h-sakurai/gdis-prolog
 sudo apt-get update
 sudo apt install gdispl
 ```
-
-- 
 
 ## 2017/11/20 version 0.0.9
 
