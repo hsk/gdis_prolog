@@ -42,6 +42,7 @@ type m = g * d * i * s      (* gdis machine *)
 type ('a, 'b) res = Fail of 'a | Succ of 'b
 let trace = ref false
 let interactive = ref false
+let libpath = ref "/usr/share/gdispl/lib/"
 let e s = match s with
   | [] -> []
   | (_, e, _, _)::_ -> e
@@ -117,7 +118,7 @@ and asserta d = function
 and consult1 d t =
 	let filename = match t with
 	| Atom a -> a
-	| Pred("library",[Atom t]) -> "/usr/share/gdispl/lib/" ^ t ^ ".pl"
+	| Pred("library",[Atom t]) -> !libpath ^ "/" ^ t ^ ".pl"
 	| _ -> failwith "loading file path error"
 	in
   if !trace then Printf.printf "Loading %s\n" filename;

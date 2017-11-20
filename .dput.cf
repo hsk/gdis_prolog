@@ -1,0 +1,14 @@
+[gdis_prolog-ppa]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~h-sakurai/ppa/ubuntu
+login = anonymous
+allow_unsigned_uploads = 0
+
+[gdis_prolog-nightly]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~h-sakurai/nightly/ubuntu
+login = anonymous
+allow_unsigned_uploads = 0
+
