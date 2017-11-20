@@ -73,9 +73,15 @@ sudo make uninstall
 
 ## 2017/11/20 version 0.1.0
 
+Ubuntu 17.04 で以下のコマンドでインストールできるようになりました。
 
+```bash
+sudo add-apt-repository ppa:h-sakurai/gdis-prolog
+sudo apt-get update
+sudo apt install gdispl
+```
 
-- PPA 登録テスト
+- 
 
 ## 2017/11/20 version 0.0.9
 
