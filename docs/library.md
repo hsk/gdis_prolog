@@ -75,6 +75,10 @@ example
     double_triple(A,B,C) :- B is A * 2, C is A * 3.
     :- maplist(double_triple,[1,2,3],[2,4,6],[3,6,9]),halt.
 
+# reverse/2
+
+リストを反転させます。
+
 # foldl/4
 
 リストの畳込みを行います。

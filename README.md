@@ -66,7 +66,9 @@ sudo make uninstall
 - 複数の:-/1述語で問題なく動作するように
 - nop/0 を true/0 に変更
 - forall/2 を追加
+- reverse/2 を追加
 - retract/1 を追加
+- asserta/1 を追加
 - retractall/1 を追加
 - リスト表示バグ修正
 
