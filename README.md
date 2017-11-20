@@ -61,7 +61,7 @@ sudo make uninstall
 
 # Change history
 
-## 2017/11/18 version 0.0.7
+## 2017/11/20 version 0.0.7
 
 - 複数の:-/1述語で問題なく動作するように
 - nop/0 を true/0 に変更
