@@ -5,9 +5,11 @@ clean:
 	cd src; make clean
 	rm -rf gdispl
 install_:
-	mkdir -p /usr/share/gdispl/
-	cp -rf lib /usr/share/gdispl/
-	cp gdispl /usr/bin/
+	install -pd $(DEB_DESTDIR)/usr/bin
+	install -pm 755 gdispl $(DEB_DESTDIR)/usr/bin
+	install -pd $(DEB_DESTDIR)/usr/share/gdispl
+	install -pm 755 lib $(DEB_DESTDIR)/usr/share/gdispl
+
 uninstall:
 	rm -rf /usr/bin/gdispl /usr/share/gdispl
 test:
@@ -23,11 +25,12 @@ dev:
 	sudo make install_
 	make test
 ppa:
-	debuild -uc -us -S -sa 
+	debuild -S -sa 
 	sudo pbuilder --build ../gdis-prolog_0.0.9.dsc
 up:
 	#debuild -S
-	debuild -uc -us -S -sa 
-	dput -f gdis-prolog  ../gdis-prolog_0.0.9_source.changes 
+	debuild -S -sa 
+#	dput -f gdis-prolog  ../gdis-prolog_0.0.9_source.changes 
+	dput ppa:h-sakurai/gdis-prolog  ../gdis-prolog_0.0.9_source.changes 
 
 .PHONY: test
