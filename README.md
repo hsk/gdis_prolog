@@ -61,6 +61,10 @@ sudo make uninstall
 
 # Change history
 
+## 2017/11/20 version 0.0.8
+
+- PPA 登録テスト
+
 ## 2017/11/20 version 0.0.7
 
 - 複数の:-/1述語で問題なく動作するように
