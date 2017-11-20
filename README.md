@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.0.7
+# GDIS Prolog verion 0.1.0
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
@@ -34,6 +34,16 @@ eval(A*B,R)
 
 # Install
 
+Ubuntu 17.04
+
+```bash
+sudo add-apt-repository ppa:h-sakurai/gdis-prolog
+sudo apt-get update
+sudo apt install gdispl
+```
+
+source build
+
 ```bash
 apt install ocaml
 make
@@ -60,6 +70,16 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/20 version 0.1.0
+
+
+
+- PPA 登録テスト
+
+## 2017/11/20 version 0.0.9
+
+- PPA 登録テスト
 
 ## 2017/11/20 version 0.0.8
 

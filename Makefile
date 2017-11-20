@@ -1,4 +1,6 @@
+VERSION = 0.1.0
 all:
+	echo "let version =\"${VERSION}\"" > src/version.ml
 	cd src; make
 	cp src/gdispl .
 clean:
@@ -24,13 +26,11 @@ dev:
 	make
 	sudo make install_
 	make test
-ppa:
+ppa_test:
 	debuild -S -sa 
-	sudo pbuilder --build ../gdis-prolog_0.0.9.dsc
-up:
-	#debuild -S
+	sudo pbuilder --build ../gdis-prolog_${VERSION}.dsc
+ppa_up:
 	debuild -S -sa 
-#	dput -f gdis-prolog  ../gdis-prolog_0.0.9_source.changes 
-	dput ppa:h-sakurai/gdis-prolog  ../gdis-prolog_0.0.9_source.changes 
+	dput ppa:h-sakurai/gdis-prolog  ../gdis-prolog_${VERSION}_source.changes 
 
 .PHONY: test
