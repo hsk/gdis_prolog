@@ -1,1 +1,1 @@
-[fuga,hoge,test]
+[test,hoge,fuga]
