@@ -1,4 +1,6 @@
-# GDIS Prolog verion 0.1.4 [![build](https://travis-ci.org/hsk/gdis_prolog.svg?branch=master)](https://travis-ci.org/hsk/gdis_prolog)
+# GDIS Prolog verion 0.1.4
+
+[![](https://travis-ci.org/hsk/gdis_prolog.svg?style=flat-square)](https://travis-ci.org/hsk/gdis_prolog)
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
