@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.3
+# GDIS Prolog verion 0.1.4
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
@@ -32,7 +32,7 @@ source build
 ```bash
 apt install ocaml
 make
-sudo make install
+sudo make install_
 ```
 
 # Hello world
@@ -55,6 +55,11 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/21 version 0.1.4
+
+- コメントアウトされていたテストコードをマクロを使ったものに書き換えました。
+- リファクタリング
 
 ## 2017/11/21 version 0.1.3
 

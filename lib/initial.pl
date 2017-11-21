@@ -1,4 +1,4 @@
-nl :- write("\n").
+nl :- write('\n').
 writeln(A) :- write(A),nl.
 
 member(A,[A|B]).

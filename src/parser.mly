@@ -1,5 +1,31 @@
 %{
 open Syntax
+let prefixs  = opn 10001 ["fx";"fy"]
+let postfixs = opn 10001 ["xf";"yf"]
+let infixrs  = opn 10001 ["xfy";"xfx"]
+let infixs   = opn 10001 ["yfx"]
+let rec opconvert e =
+	fst (opconvert_pre 10000 e)
+and opconvert_pre p = function
+	| Pred("",[Atom(op);y]) when prefixs op <= p ->
+		let (t,ts) = opconvert_pre (prefixs op) y in
+		(Pred(op,[t]),ts)
+	| Pred("",[Pred("",xs);y]) ->
+		let (t,ts) = opconvert_pre 10000 (Pred("",xs)) in
+		opconvert_post p t y
+	| Pred("",[x;y]) -> opconvert_post p (opconvert x) y
+	| Pred(a,s) -> (Pred(a,List.map opconvert s),Atom"")
+	| e -> (e, Atom "")
+and opconvert_post p t = function
+	| Pred("",[Atom(op);y]) when infixs op < p ->
+		let (t2,ts2) = opconvert_pre (infixs op) y in
+		opconvert_post p (Pred(op,[t;t2])) ts2
+	| Pred("",[Atom(op);y]) when infixrs op <= p ->
+		let (t2,ts2) = opconvert_pre (infixrs op) y in
+		opconvert_post p (Pred(op,[t;t2])) ts2
+	| Pred("",[Atom(op);y]) when postfixs op <= p ->
+		opconvert_post p (Pred(op,[t])) y
+	| tokens -> (t,tokens)
 %}
 %token <string> ATOM
 %token <float> NUMBER
@@ -15,9 +41,9 @@ open Syntax
 %start sentence
 %type <Syntax.t> sentence
 %%
-query:    | exp DOT                    { exp $1 }
+query:    | exp DOT                    { opconvert $1 }
 sentence: | EOF                        { Atom "" }
-          | exp DOT                    { exp $1 }
+          | exp DOT                    { opconvert $1 }
 exp:      | exp1                       { $1 }
           | exp1 exp                   { Pred("",[$1;$2]) }
           | exp1 COMMA exp             { Pred("",[$1;Pred("",[Atom(",");$3])]) }

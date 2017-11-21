@@ -1,32 +1,31 @@
-:- op(1200,xfx,--).
-term_expansion(A--B,B:-A).
+:- op(1200,xfx,--). term_expansion(A--B,B:-A).
 
-mem(E,(E;E1)).
-mem(E,(X;E1)) :- mem(E,E1).
+mem(A,Γ;A).
+mem(A,Γ;B) :- mem(A, Γ).
 
-mem(A=V,E)
---%----------- (Var)
-eval(E,A,V).
+integer(I), !
+--%----------------------------------------- (E-Int)
+eval(Γ,I,I).
+
+eval(Γ,E1,I1),   eval(Γ,E2,I2),   I is I1+I2
+--%----------------------------------------- (E-Add)
+eval(Γ,E1+E2,I).
+
+eval(Γ,E1,I1),   eval(Γ,E2,I2),   I is I1*I2
+--%----------------------------------------- (E-Mul)
+eval(Γ,E1*E2,I).
+
+atom(X),!,   mem(X=V,Γ)
+--%----------------------------------------- (E-Var)
+eval(Γ,X,V).
 
 !
---%------------------------- (Abs)
-eval(E,(X;A),(E;X;A)).
+--%----------------------------------------- (E-Abs)
+eval(Γ,X->E,closure(Γ;X->E)).
 
-eval(E,A,(E1;X;A_)),    eval(E,B,B_),
-eval((X=B_;E1),A_,A2)
---%------------------------------------ (App)
-eval(E,(A,B),A2).
+eval(Γ,E1,closure(Γ1;X->E)),   eval(Γ,E2,V2),
+eval(Γ1;X=V2,E,V)
+--%----------------------------------------- (E-App)
+eval(Γ,(E1,E2),V).
 
-integer(A), !
---%---------- (Integer)
-eval(E,A,A).
-
-eval(E,A,R1),    eval(E,B,R2),    R is R1 + R2
---%------------------------------------------- (Add)
-eval(E,A+B,R).
-
-eval(E,A,R1),    eval(E,B,R2),    R is R1 * R2
---%------------------------------------------- (Mul)
-eval(E,A*B,R).
-
-:- eval(0,(((a;b;a+b),1),2)*3,R),writeln(R),R=9,!,halt.
+:- eval([],(((a->b->a+b),1),2)*3,R),writeln(R),R=9,!,halt.

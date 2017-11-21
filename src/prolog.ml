@@ -83,38 +83,29 @@ let call t g d i s = match List.map (fun t -> deref (e s) t) t with
 let to_db = function
 	| Pred(":-",[_;_]) as t -> t
 	| t               -> Pred(":-",[t;Atom "true"])
-let retract1 d t e =
+let retract retractf d t e =
 	let t = to_db t in
-	Db.retract d (fun dt ->
+	retractf d (fun dt ->
 		match dt,t with
 		| (Pred(":-",[dt;_]),Pred(":-",[t;_])) ->
 			(match unify e t dt with Some _ -> true | None -> false)
 		| _ -> false
 	)
-let retractall d t e =
-	let t = to_db t in
-	Db.retractall d (fun dt ->
-		match dt,t with
-		| (Pred(":-",[dt;_]),Pred(":-",[t;_])) ->
-			(match unify e t dt with Some _ -> true | None -> false)
-		| _ -> false
-	)
-	
-let retractz d t e =
-	let t = to_db t in
-	Db.retractz d (fun dt ->
-		match dt,t with
-		| (Pred(":-",[dt;_]),Pred(":-",[t;_])) ->
-			(match unify e t dt with Some _ -> true | None -> false)
-		| _ -> false
-	)
+let retract1 = retract Db.retract
+let retractall = retract Db.retractall	
+let retractz = retract Db.retractz
 
 let rec to_list = function
 	| Atom "[]" -> []
 	| Pred("[|]",[a;b]) -> a::to_list b
 	| c -> [c]
+
 let opadd s p a ls =
-	let ls = List.map(fun a-> match deref (e s) a with Atom a -> a) (to_list ls) in
+	let ls = List.map(fun a->
+		match deref (e s) a with
+		| Atom a -> a
+		| _ -> assert false
+	) (to_list ls) in
 	match deref (e s) p, deref (e s) a, ls with
 	| Number p, Atom a, ls -> Syntax.opadd(int_of_float p, a, ls)
 	| _ -> ()
@@ -193,7 +184,6 @@ and solve m =
         | Some e -> step (Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s))
         end
 			| (_,nx) -> step(Succ(t::g,d,nx,s))
-			| (t,_) -> Printf.printf "Database is broken. %s\n" (Syntax.show t); Fail d
   in
   step (match m with
     | [], _, _, _ -> pop m

@@ -1,94 +1,72 @@
 open Syntax
-(*
-DBは述語と次のアドレスが入った配列です。
-ただし、０番地にはフリーリスト、１番目はリストの開始番地、２番めには終了番地が書かれています。
 
-*)
 type db = (Syntax.t * int) array
 
 let empty () = Array.copy [|
-	Atom"freelist",0;
-	Atom"start",3;
-	Atom"end",2;
+  Atom"freelist",0;
+  Atom"start",3;
+  Atom"end",2;
 |]
 
 let dump db =
-	let i = ref 0 in
-	Array.iter(fun (p,n) ->
-		Printf.printf "%d : %s %d\n" !i (show p) n;
-		i := !i + 1
-	) db
+  let i = ref 0 in
+  Array.iter(fun (p,n) ->
+    Printf.printf "%d : %s %d\n" !i (show p) n;
+    i := !i + 1
+  ) db
 
-(* 開始アドレス取得 *)
 let get_free (db:db):int = snd db.(0)
-
-(* 開始アドレス取得 *)
 let get_start db = snd db.(1)
-
-(* 終了アドレス取得 *)
 let get_end db = snd db.(2)
-
-(* DBに追加してアドレスを返します。ただし、リンク情報は追加されません。*)
 let new_free (db:db) p n : (int * db) =
-	let free = get_free db in
-	if free = 0 then (Array.length db,Array.append db [|p,n|])
-	else ((* フリーデータを１つ取り出し繋ぎ変えます。 *)
-		failwith "error use free datas";
-		db.(0) <- (fst db.(0), snd db.(free));
-		db.(free) <- (p,n);
-		(free,(db:db))
-	)
+  let free = get_free db in
+  if free = 0 then (Array.length db,Array.append db [|p,n|])
+  else (
+    failwith "error use free datas";
+    (*db.(0) <- (fst db.(0), snd db.(free));
+    db.(free) <- (p,n);
+    (free,(db:db))*)
+  )
 
-(*
-dbの後ろに追加
-フリーリストがあればフリーリストからデータを取り出し終了位置の後ろにつなげます。終了位置に設定します。
-フリーリストがなければ、一番下に追加します。
-*)
 let assert1 (db:db) p =
-	(*Printf.printf "\n-----\nassert1 %s\n" (show p);
-	dump db;*)
-	let endp = get_end db in
-	let (newp,db) = new_free db p 0 in
-	db.(endp) <- (fst db.(endp),newp); (* リンクにつなぎ *)
-	db.(2) <- (fst db.(2),newp); (* 終了位置を保存 *)
-	(*Printf.printf "\n-----\n";
-	dump db;*)
-	db
+  let endp = get_end db in
+  let (newp,db) = new_free db p 0 in
+  db.(endp) <- (fst db.(endp),newp);
+  db.(2) <- (fst db.(2),newp);
+  db
 
-(* 指定インデックスを削除 *)
 let remove db n =
-	db.(n) <- (Number (float_of_int (snd db.(0))), snd db.(n));
-	db.(0) <- (Number (float_of_int n), snd db.(0));
-	db
-(* dbの手前から１つ削除 *)
+  db.(n) <- (Number (float_of_int (snd db.(0))), snd db.(n));
+  db.(0) <- (Number (float_of_int n), snd db.(0));
+  db
+
 let retract db (f:Syntax.t->bool) =
-	let rec loop i db =
-		if i = 0 then db else
-		let (t,n) = db.(i) in
-		if f t then remove db i else loop n db
-	in
-	let db = loop (get_start db) db in
-	db
-	(* fがtrueを返すデータをみつけて１つ消す*)
+  let rec loop i db =
+    if i = 0 then db else
+    let (t,n) = db.(i) in
+    if f t then remove db i else loop n db
+  in
+  loop (get_start db) db
 
-(*dbの手前に追加
-フリーリストがあればフリーリストからデータを取り出し開始アドレスに追加します。
-フリーリストがなければ終了位置に追加します。
-*)
 let asserta db p =
-	let startp = get_start db in
-	let (newp,db) = new_free db p startp in
-	db.(1) <- (fst db.(1),newp); (* 開始位置を保存 *)
-	db
+  let startp = get_start db in
+  let (newp,db) = new_free db p startp in
+  db.(1) <- (fst db.(1),newp);
+  db
 
-(* dbの後ろからから１つ削除 *)
 let retractz db f =
-	(* fがtrueを返すデータをみつけて１つ消す*)
-	assert false
+  let rec loop i p =
+    if i = 0 then p else
+    let (t,n) = db.(i) in
+    loop n (if f t then i else p)
+  in
+  let p = loop (get_start db) 0 in
+  if p = 0 then db else remove db p
 
-(* 全部消す *)
 let retractall db f =
-	assert false
-
-(* 一つ取り出す *)
-let get db i = assert false
+  let rec loop i db =
+    if i = 0 then db else
+    let (t,n) = db.(i) in
+    loop n (if f t then remove db i else db)
+  in
+  loop (get_start db) db
