@@ -156,7 +156,11 @@ and show_list = function
   | t                                    -> show (opn Xfy ",") t
 and shows ls =
   String.concat ", " (List.map (fun e-> show (opn Xfy ",") e) ls)
-let show: t -> string = show 10000
+let show: t -> string = show 10002
+let opn o op =
+	try List.assoc op (List.assoc o !opsmap)
+	with _ -> 10001
+
 let prefixs op =
 	try List.assoc op (List.assoc Fx !opsmap)
 	with _ -> opn Fy op
