@@ -1,5 +1,3 @@
 language: c
-script: bash -ex .travis-ocaml.sh && make && make test
-env:
-  - OCAML_VERSION=4.02
+script: apt install ocaml && make && make test
 sudo: required
