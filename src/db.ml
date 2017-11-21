@@ -28,7 +28,13 @@ let new_free (db:db) p n : (int * db) =
     (free,(db:db))*)
   )
 
-let assert1 (db:db) p =
+let asserta db p =
+  let startp = get_start db in
+  let (newp,db) = new_free db p startp in
+  db.(1) <- (fst db.(1),newp);
+  db
+  
+let assertz (db:db) p =
   let endp = get_end db in
   let (newp,db) = new_free db p 0 in
   db.(endp) <- (fst db.(endp),newp);
@@ -47,21 +53,6 @@ let retract db (f:Syntax.t->bool) =
     if f t then remove db i else loop n db
   in
   loop (get_start db) db
-
-let asserta db p =
-  let startp = get_start db in
-  let (newp,db) = new_free db p startp in
-  db.(1) <- (fst db.(1),newp);
-  db
-
-let retractz db f =
-  let rec loop i p =
-    if i = 0 then p else
-    let (t,n) = db.(i) in
-    loop n (if f t then i else p)
-  in
-  let p = loop (get_start db) 0 in
-  if p = 0 then db else remove db p
 
 let retractall db f =
   let rec loop i db =

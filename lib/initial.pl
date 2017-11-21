@@ -1,3 +1,4 @@
+assert(A) :- assertz(A).
 nl :- write('\n').
 writeln(A) :- write(A),nl.
 

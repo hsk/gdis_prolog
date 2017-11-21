@@ -92,8 +92,7 @@ let retract retractf d t e =
 		| _ -> false
 	)
 let retract1 = retract Db.retract
-let retractall = retract Db.retractall	
-let retractz = retract Db.retractz
+let retractall = retract Db.retractall
 
 let rec to_list = function
 	| Atom "[]" -> []
@@ -110,9 +109,9 @@ let opadd s p a ls =
 	| Number p, Atom a, ls -> Syntax.opadd(int_of_float p, a, ls)
 	| _ -> ()
 
-let rec assert1 d = function
+let rec assertz d = function
   | Pred(":-", [t]) -> process d t
-	| t               -> Db.assert1 d (to_db t)
+	| t               -> Db.assertz d (to_db t)
 and asserta d = function
 	| Pred(":-", [t]) -> process d t
 	| t               -> Db.asserta d (to_db t)
@@ -132,8 +131,8 @@ and consult1 d t =
 			let v = Var("_",-1) in
 			let p1 = Pred("term_expansion",[p;v]) in
 			match solve([p1], d, -1, []) with
-			| Succ(g,d,i,s) -> loop (assert1 d (deref (e s) v))
-			| Fail d -> loop (assert1 d p)
+			| Succ(g,d,i,s) -> loop (assertz d (deref (e s) v))
+			| Fail d -> loop (assertz d p)
 	in loop d
 and not1 g d s = function
 	| Fail d -> Succ(g,d,-1,s)
@@ -156,11 +155,10 @@ and solve m =
     | Pred("\\=", [u;v])  ::g, d, -1, s -> step (uninot m s u v)
     | Pred("\\", [u])     ::g, d, -1, s -> step (not1 g d s (step(Succ([u], d, -1, []))))
     | Pred("is", [u;v])   ::g, d, -1, s -> step (uni m s u (Number(eval (e s) (deref (e s) v))))
-    | Pred("assert",  [t])::g, d, -1, s -> step (Succ(g, assert1 d (deref (e s) t), -1, s))
+    | Pred("assertz",  [t])::g, d, -1, s -> step (Succ(g, assertz d (deref (e s) t), -1, s))
     | Pred("asserta",  [t])::g, d, -1, s -> step (Succ(g, asserta d (deref (e s) t), -1, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))
     | Pred("retract", [t])::g, d, -1, s -> step (Succ(g,retract1 d t (e s),-1,s))
-    | Pred("retractz", [t])::g, d, -1, s -> step (Succ(g,retractz d t (e s),-1,s))
     | Pred("retractall", [t])::g, d, -1, s -> step (Succ(g,retractall d t (e s),-1,s))
     | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 d (deref (e s) t), i, s))
 		| Pred("integer", [t])::g, d, -1, s -> step (match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
