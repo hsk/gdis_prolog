@@ -137,7 +137,12 @@ and consult1 d t =
 	let rec loop d =
 		match Parser.sentence Lexer.token lexer with
 		| Atom _ -> d
-		| p -> loop (assert1 d p)
+		| p -> 
+			let v = Var("_",-1) in
+			let p1 = Pred("term_expansion",[p;v]) in
+			match solve([p1], d, -1, []) with
+			| Succ(g,d,i,s) -> loop (assert1 d (deref (e s) v))
+			| Fail d -> loop (assert1 d p)
 	in loop d
 and not1 g d s = function
 	| Fail d -> Succ(g,d,-1,s)
@@ -173,7 +178,8 @@ and solve m =
 		| Pred("op",[p;m;ls]) ::g, d, -1, s -> opadd s p m ls; step (Succ(g,d,-1,s))
 		|                       g, d, -1, s -> step (Succ(g, d, Db.get_start d, s))
 		|                    t::g, d,  i, s ->
-      if i==0 then step (pop m) else
+			if i==0 then step (pop m) else
+			if Array.length d <= i then Fail d else
       match d.(i) with
       | (Pred(":-", [t2; t3]),nx) ->
         let e,l1 = el1 s in

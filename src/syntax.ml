@@ -56,15 +56,6 @@ let init_ops() =
 
 let () = init_ops()
 
-let show_opp (op,p) = Printf.sprintf "%S,%d" op p
-
-let show_opps () =
-  !opsmap |> List.iter(fun (o,ls)->
-    Printf.printf "%s : " o;
-    let ls = List.map show_opp ls in
-    Printf.printf "[%s]\n" (String.concat "; " ls)
-  )
-
 let opn o op =
   try List.assoc op (List.assoc o !opsmap)
   with _ -> -1
