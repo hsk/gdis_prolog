@@ -1,3 +1,9 @@
+gdis-prolog (0.1.1) UNRELEASED; urgency=medium
+
+  * change parser algorithm 
+
+ -- sakurai <sakurai@sakurai-FMVNF75WZ>  Tue, 21 Nov 2017 16:17:01 +0900
+
 gdis-prolog (0.1.0) zesty; urgency=medium
 
   * new version

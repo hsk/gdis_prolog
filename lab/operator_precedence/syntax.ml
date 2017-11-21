@@ -2,10 +2,10 @@ type x = string
 
 type t =
   | Atom of x
-  | Number of float
+  | Number of x
   | Str of x
   | Pred of x * t list
-  | Var of (x * int)
+  | Var of x
 
 type opp = Xfx|Yfx|Fx|Fy|Xfy|Xf|Yf
 
@@ -93,10 +93,10 @@ let opnFx op =
   try List.assoc op (List.assoc Fx !opsmap)
   with _ -> opn Fy op
 
-let is_upper x =
+let is_lower x =
   if x = "" then false else
   let c = Char.code (String.get x 0) in
-  (c >= Char.code 'A' && c <= Char.code 'Z' || c == Char.code '_')
+  (c >= Char.code 'a' && c <= Char.code 'z')
 
 let escaped x =
   let reg = Str.regexp "'" in
@@ -105,16 +105,16 @@ let escaped x =
 
 let rec show1 = function
   | Atom(x)           -> Printf.sprintf "Atom(%s)" (show_atom x)
-  | Number(n)         -> Printf.sprintf "Number(%f)" n
+  | Number(n)         -> Printf.sprintf "Number(%S)" n
   | Str(x)            -> Printf.sprintf "Str(%S)" x
   | Pred(x, xs)       -> Printf.sprintf "Pred(%s,[%s])" (show_atom x) (show1s xs)
-  | Var(x,i)          -> Printf.sprintf "Var(%s,%d)" x i
+  | Var(x)            -> x
 and show1s ls =
   String.concat ", " (List.map (fun e-> show1 e) ls)
 and show_atom x = Printf.sprintf "%S" x
 
 let show_atom x =
-  if is_upper x then Printf.sprintf "'%s'" (escaped x) else x
+  if is_lower x then x else Printf.sprintf "'%s'" (escaped x)
 
 let showbin = function
   | "," -> ", "
@@ -138,9 +138,8 @@ let rec show p = function
   | Atom("!")           -> "!"
   | Atom("[]")          -> "[]"
   | Atom(x)             -> show_atom x
-	| Number(n)           -> let s = string_of_float n in let l = (String.length s)-1 in
-													 if String.sub s l 1 = "." then String.sub s 0 l else s
-  | Str(x)              -> Printf.sprintf "%s" x
+  | Number(n)           -> n
+  | Str(x)              -> Printf.sprintf "%S" x
   | Pred(x, [xs]) when opnFx x >= p -> let p = opnFx x in Printf.sprintf "(%s %s)" x (show p xs)
   | Pred(x, [xs]) when opnFx x >= 0 -> let p = opnFx x in Printf.sprintf "%s %s" x (show p xs)
   | Pred(".",[xs])      -> Printf.sprintf "%s.\n" (show p xs)
@@ -148,7 +147,7 @@ let rec show p = function
 	| Pred("{}", xs)      -> Printf.sprintf "{%s}" (shows xs)
   | Pred("[|]", _) as t -> Printf.sprintf "[%s]" (show_list t)
   | Pred(x, xs)         -> Printf.sprintf "%s(%s)" (show_atom x) (shows xs)
-  | Var(x,i)            -> Printf.sprintf "%s_%d" x i
+  | Var(x)              -> x
 and show_list = function
   | Pred("[|]", [t; Atom("[]")])         -> show (opn Xfy ",") t
   | Pred("[|]", [t;Pred("[|]", _) as u]) -> show (opn Xfy ",") t ^ "," ^ show_list u
@@ -156,11 +155,11 @@ and show_list = function
   | t                                    -> show (opn Xfy ",") t
 and shows ls =
   String.concat ", " (List.map (fun e-> show (opn Xfy ",") e) ls)
-let show: t -> string = show 10002
 let opn o op =
 	try List.assoc op (List.assoc o !opsmap)
 	with _ -> 10001
-
+	
+let show = show 10002
 let prefixs op =
 	try List.assoc op (List.assoc Fx !opsmap)
 	with _ -> opn Fy op
@@ -186,8 +185,8 @@ let rec exp_pre p = function
 	| Pred("",[Pred("",xs);y]) ->
 		let (t,ts) = (exp_pre 10000 (Pred("",xs))) in
 		exp_infix p t y
-	| Pred("",[x;y]) -> exp_infix p (exp x) y
-	| Pred(a,s) -> (Pred(a,List.map exp s),Atom"")
+	| Pred("",[x;y]) -> exp_infix p (opconvert x) y
+	| Pred(a,s) -> (Pred(a,List.map opconvert s),Atom"")
 	| e -> (e, Atom "")
 
 and exp_infix p t = function
@@ -200,6 +199,6 @@ and exp_infix p t = function
 	| Pred("",[Atom(op);y]) when postfixs op <= p ->
 		exp_infix p (Pred(op,[t])) y
 	| tokens -> (t,tokens)
-and exp e =
+and opconvert e =
   let a = exp_pre 10000 e in
   fst a
