@@ -1,2 +1,1 @@
-macro1 : (a :- writeln(aok))
-aok
+6
