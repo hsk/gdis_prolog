@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.1
+# GDIS Prolog verion 0.1.2
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
