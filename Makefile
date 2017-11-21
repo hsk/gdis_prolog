@@ -1,4 +1,4 @@
-VERSION = 0.1.0
+VERSION = 0.1.1
 all:
 	echo "let version =\"${VERSION}\"" > src/version.ml
 	cd src; make
@@ -10,7 +10,7 @@ install_:
 	install -pd $(DEB_DESTDIR)/usr/bin
 	install -pm 755 gdispl $(DEB_DESTDIR)/usr/bin
 	install -pd $(DEB_DESTDIR)/usr/share/gdispl
-	install -pm 755 lib $(DEB_DESTDIR)/usr/share/gdispl
+	cp -rf lib $(DEB_DESTDIR)/usr/share/gdispl
 
 uninstall:
 	rm -rf /usr/bin/gdispl /usr/share/gdispl
@@ -24,8 +24,8 @@ push:
 	git push
 dev:
 	make
-	sudo make install_
 	make test
+	sudo make install_
 ppa_test:
 	debuild -S -sa 
 	sudo pbuilder --build ../gdis-prolog_${VERSION}.dsc
