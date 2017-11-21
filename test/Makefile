@@ -25,6 +25,7 @@ test:
 	../gdispl -lib ../lib ../examples/sum2.pl > result.txt && diff result.txt results/sum2.txt
 	../gdispl -lib ../lib ../examples/sum3.pl > result.txt && diff result.txt results/sum3.txt
 	../gdispl -lib ../lib ../examples/list.pl > result.txt && diff result.txt results/list.txt
+	../gdispl -lib ../lib ../examples/op.pl > result.txt && diff result.txt results/op.txt
 	rm -rf result.txt
 	@echo "test ok"
 mkresults:
@@ -54,6 +55,7 @@ mkresults:
 	../gdispl -lib ../lib ../examples/sum2.pl > results/sum2.txt
 	../gdispl -lib ../lib ../examples/sum3.pl > results/sum3.txt
 	../gdispl -lib ../lib ../examples/list.pl > results/list.txt
+	../gdispl -lib ../lib ../examples/op.pl > results/op.txt
 
 clean:
 	rm -rf result.txt

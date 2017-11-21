@@ -1,9 +1,5 @@
 %{
 open Syntax
-let opconvert t =
-  match exp t with
-  | Pred(":-",p) -> Pred(":-",p)
-  | a -> Pred(":-",[a;Atom "true"])
 %}
 %token <string> ATOM
 %token <float> NUMBER

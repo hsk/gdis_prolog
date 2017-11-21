@@ -108,7 +108,17 @@ let retractz d t e =
 			(match unify e t dt with Some _ -> true | None -> false)
 		| _ -> false
 	)
-			
+
+let rec to_list = function
+	| Atom "[]" -> []
+	| Pred("[|]",[a;b]) -> a::to_list b
+	| c -> [c]
+let opadd s p a ls =
+	let ls = List.map(fun a-> match deref (e s) a with Atom a -> a) (to_list ls) in
+	match deref (e s) p, deref (e s) a, ls with
+	| Number p, Atom a, ls -> Syntax.opadd(int_of_float p, a, ls)
+	| _ -> ()
+
 let rec assert1 d = function
   | Pred(":-", [t]) -> process d t
 	| t               -> Db.assert1 d (to_db t)
@@ -160,6 +170,7 @@ and solve m =
 		| Pred("integer", [t])::g, d, -1, s -> step (match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("atom",    [t])::g, d, -1, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("call",      t)::g, d, -1, s -> step (call t g d (-1) s)
+		| Pred("op",[p;m;ls]) ::g, d, -1, s -> opadd s p m ls; step (Succ(g,d,-1,s))
 		|                       g, d, -1, s -> step (Succ(g, d, Db.get_start d, s))
 		|                    t::g, d,  i, s ->
       if i==0 then step (pop m) else

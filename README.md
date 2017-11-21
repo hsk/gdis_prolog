@@ -13,24 +13,9 @@ VSCode プラグインを作るのも目標の１つです。簡単なPrologの�
 
 ## 特徴
 
-基本的には標準的なPrologを目指していますが、
-以下のように自然演繹スタイルの述語定義をサポートしています。
-
-```prolog
-integer(A)
----------- (E-Int)
-eval(A,A)
-
-eval(A,R1) eval(B,R2) R is R1 + R2
----------------------------------- (E-Add)
-eval(A+B,R)
-
-eval(A,R1) eval(B,R2) R is R1 * R2
----------------------------------- (E-Add)
-eval(A*B,R)
-
-:- eval(1+2*3,R),write(R),nl,!,halt.
-```
+- 小さなプログラム
+- OCaml による綺麗な実装
+- OCamlYacc による構文解析と下降型演算子順位法によるユーザー定義演算子
 
 # Install
 
@@ -70,6 +55,46 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/21 version 0.1.2
+
+- ユーザー定義演算子をop/3 で以下のように定義して使うことができるようになりました:
+
+    ```prolog
+    :- op(600,xfy,add).
+    :- op(500,xfy,mul).
+
+    eval(I,I) :- integer(I).
+    eval(A add B, I) :- eval(A,A_),eval(B,B_), I is A_ + B_. 
+    eval(A mul B, I) :- eval(A,A_),eval(B,B_), I is A_ * B_. 
+    :- eval(1 mul 2 add 3 add 4 mul 5,I),writeln(I),halt.
+    ```
+
+    以下のコマンドで試してみることが出来ます:
+
+    ```bash
+    $ gdispl examples/op.pl
+    25
+    ```
+
+- -v オプションで以下のようにバージョン情報の表示をするようになりました:
+
+    ```bash
+    $ gdispl -v
+    GDIS Prolog version 0.1.2
+    ```
+- --help オプションのヘルプ表示は以下のようにアラインを合わせて綺麗に表示するようになりました:
+
+    ```bash
+    $ gdispl --help
+    Usage: gdispl [options] file...
+    Options:
+      -t            Set trace mode
+      -v            Display version infomation
+      -lib libpath  Set libraries path
+      -help         Display this list of options
+      --help        Display this list of options
+    ```
 
 ## 2017/11/21 version 0.1.1
 

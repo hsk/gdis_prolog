@@ -7,46 +7,34 @@ type t =
   | Pred of x * t list
   | Var of (x * int)
 
-type opp = Xfx|Yfx|Fx|Fy|Xfy|Xf|Yf
-
-let show_o = function
-  |Xfx -> "xfx"
-  |Yfx -> "xyx"
-  |Fx -> "fx"
-  |Fy -> "fy"
-  |Xfy -> "xfy"
-  |Xf -> "xf"
-  |Yf -> "yf"
-
-
 let default_ops = [
-    600, Xfy, ["::";"as"];
-    910, Xfx, ["/-";"\\-"];
-    920, Xfx, [ "==>"; "==>>";"<:" ];
+    600, "xfy", ["::";"as"];
+    910, "xfx", ["/-";"\\-"];
+    920, "xfx", [ "==>"; "==>>";"<:" ];
 
-    1300,	Xf,	["."]; (* added *)
-    1200,	Xfx,	["-->"; ":-"; "::="(*added*)];
-    1190,	Fx,	[":-"; "?-"];
-    1150,	Fx,	["dynamic"; "discontiguous"; "initialization"; "meta_predicate";"module_transparent"; "multifile"; "public"; "thread_local";"thread_initialization"; "volatile"];
-    1100,	Xfy,	[";"];
-    (*1100,	Xfy,	[";"; "|"];*)
-    1050,	Xfy,	["->"; "*->"];
-    1000,	Xfy,	[","];
+    1300,	"xf",	["."]; (* added *)
+    1200,	"xfx",	["-->"; ":-"; "::="(*added*)];
+    1190,	"fx",	[":-"; "?-"];
+    1150,	"fx",	["dynamic"; "discontiguous"; "initialization"; "meta_predicate";"module_transparent"; "multifile"; "public"; "thread_local";"thread_initialization"; "volatile"];
+    1100,	"xfy",	[";"];
+    (*1100,	"xfy",	[";"; "|"];*)
+    1050,	"xfy",	["->"; "*->"];
+    1000,	"xfy",	[","];
 
-    995,  Xfy,  ["|"];(* change *)
+    995,  "xfy",  ["|"];(* change *)
 
-    990,	Xfx,	[":="];
-    900,	Fy,	["\\+"];
-    700,	Xfx,	["<"; "="; "=.."; "=@="; "\\=@="; "=:="; "=<"; "=="; "=\\="; ">"; ">="; "@<"; "@=<"; "@>"; "@>="; "\\="; "\\=="; "as"; "is"; ">:<"; ":<"];
-    600,	Xfy,	[":"];
-    500,	Yfx,	["+"; "-"; "/\\"; "\\/"; "xor"];
-    500,	Fx,	["?"];
-    400,	Yfx,	["*"; "/"; "//"; "div"; "rdiv"; "<<"; ">>"; "mod"; "rem"];
-    200,	Xfx,	["**"];
-    200,	Xfy,	["^"];
-    200,	Fy,	["+"; "-"; "\\"];
-(*    100,	Yfx,	["."];*)
-    1,	Fx,	["$"];
+    990,	"xfx",	[":="];
+    900,	"fy",	["\\+"];
+    700,	"xfx",	["<"; "="; "=.."; "=@="; "\\=@="; "=:="; "=<"; "=="; "=\\="; ">"; ">="; "@<"; "@=<"; "@>"; "@>="; "\\="; "\\=="; "as"; "is"; ">:<"; ":<"];
+    600,	"xfy",	[":"];
+    500,	"yfx",	["+"; "-"; "/\\"; "\\/"; "xor"];
+    500,	"fx",	["?"];
+    400,	"yfx",	["*"; "/"; "//"; "div"; "rdiv"; "<<"; ">>"; "mod"; "rem"];
+    200,	"xfx",	["**"];
+    200,	"xfy",	["^"];
+    200,	"fy",	["+"; "-"; "\\"];
+(*    100,	"yfx",	["."];*)
+    1,	"fx",	["$"];
   ]
 
 let opsmap = ref []
@@ -63,7 +51,7 @@ let opadd(p,o,(ls : string list)) =
   ) ls
 
 let init_ops() =
-  opsmap := [Xfx,[];Yfx,[];Fx,[];Fy,[];Xfy,[];Xf,[];Yf,[]];
+  opsmap := ["xfx",[];"yfx",[];"fx",[];"fy",[];"xfy",[];"xf",[];"yf",[]];
   List.iter opadd default_ops
 
 let () = init_ops()
@@ -72,7 +60,7 @@ let show_opp (op,p) = Printf.sprintf "%S,%d" op p
 
 let show_opps () =
   !opsmap |> List.iter(fun (o,ls)->
-    Printf.printf "%s : " (show_o o);
+    Printf.printf "%s : " o;
     let ls = List.map show_opp ls in
     Printf.printf "[%s]\n" (String.concat "; " ls)
   )
@@ -82,16 +70,16 @@ let opn o op =
   with _ -> -1
 
 let opnXfy op =
-  try List.assoc op (List.assoc Xfy !opsmap)
-  with _ -> opn Xfx op
+  try List.assoc op (List.assoc "xfy" !opsmap)
+  with _ -> opn "xfx" op
 
 let opnXf op =
-  try List.assoc op (List.assoc Xf !opsmap)
-  with _ -> opn Yf op
+  try List.assoc op (List.assoc "xf" !opsmap)
+  with _ -> opn "yf" op
 
 let opnFx op =
-  try List.assoc op (List.assoc Fx !opsmap)
-  with _ -> opn Fy op
+  try List.assoc op (List.assoc "fx" !opsmap)
+  with _ -> opn "fy" op
 
 let is_upper x =
   if x = "" then false else
@@ -123,11 +111,11 @@ let showbin = function
 
 let rec show p = function
   | Pred("",[t1;t2])   -> Printf.sprintf "%s %s"  (show 10000 t1) (show 10000 t2)
-  | Pred(x,[t1;t2]) when opn Yfx x >= p ->
-    let p2 = opn Yfx x in
+  | Pred(x,[t1;t2]) when opn "yfx" x >= p ->
+    let p2 = opn "yfx" x in
     Printf.sprintf "(%s%s%s)"  (show (p2+1) t1) (showbin x) (show (p2-0) t2)
-  | Pred(x,[t1;t2]) when opn Yfx x >= 0 ->
-    let p2 = opn Yfx x in
+  | Pred(x,[t1;t2]) when opn "yfx" x >= 0 ->
+    let p2 = opn "yfx" x in
     Printf.sprintf "%s%s%s" (show (p2+1) t1) (showbin x) (show (p2-0) t2)
   | Pred(x,[t1;t2]) when opnXfy x >= p ->
     let p2 = opnXfy x in
@@ -150,34 +138,34 @@ let rec show p = function
   | Pred(x, xs)         -> Printf.sprintf "%s(%s)" (show_atom x) (shows xs)
   | Var(x,i)            -> Printf.sprintf "%s_%d" x i
 and show_list = function
-  | Pred("[|]", [t; Atom("[]")])         -> show (opn Xfy ",") t
-  | Pred("[|]", [t;Pred("[|]", _) as u]) -> show (opn Xfy ",") t ^ "," ^ show_list u
-  | Pred("[|]", [t;u])                   -> show (opn Xfy ",") t ^ "|" ^ show (opn Xfy ",") u
-  | t                                    -> show (opn Xfy ",") t
+  | Pred("[|]", [t; Atom("[]")])         -> show (opn "xfy" ",") t
+  | Pred("[|]", [t;Pred("[|]", _) as u]) -> show (opn "xfy" ",") t ^ "," ^ show_list u
+  | Pred("[|]", [t;u])                   -> show (opn "xfy" ",") t ^ "|" ^ show (opn "xfy" ",") u
+  | t                                    -> show (opn "xfy" ",") t
 and shows ls =
-  String.concat ", " (List.map (fun e-> show (opn Xfy ",") e) ls)
+  String.concat ", " (List.map (fun e-> show (opn "xfy" ",") e) ls)
 let show: t -> string = show 10002
 let opn o op =
 	try List.assoc op (List.assoc o !opsmap)
 	with _ -> 10001
 
 let prefixs op =
-	try List.assoc op (List.assoc Fx !opsmap)
-	with _ -> opn Fy op
+	try List.assoc op (List.assoc "fx" !opsmap)
+	with _ -> opn "fy" op
 	
 let infixrs op =
-  try List.assoc op (List.assoc Xfy !opsmap)
+  try List.assoc op (List.assoc "xfy" !opsmap)
   with _ ->
-  (try List.assoc op (List.assoc Xfx !opsmap)
+  (try List.assoc op (List.assoc "xfx" !opsmap)
   with _ -> 10001)
 
 let infixs op =
-  try List.assoc op (List.assoc Yfx !opsmap)
+  try List.assoc op (List.assoc "yfx" !opsmap)
   with _ -> 10001
 
 let postfixs op =
-  try List.assoc op (List.assoc Xf !opsmap)
-  with _ -> opn Yf op
+  try List.assoc op (List.assoc "xf" !opsmap)
+  with _ -> opn "yf" op
 
 let rec exp_pre p = function
 	| Pred("",[Atom(op);y]) when prefixs op <= p ->

@@ -3,7 +3,7 @@ open Prolog
 open Version
 
 let welcome = "GDIS Prolog version " ^ version
-
+let usage = "Usage: gdispl [options] file...\nOptions:"
 let parse str =
   Parser.query Lexer.token (Lexing.from_string str)
 
@@ -25,10 +25,16 @@ let rec repl (d:(Syntax.t * int) array) =
 
 let () =
 	let files = ref [] in
-  Arg.parse
-    ["-t", Arg.Set trace, "trace";"-lib", Arg.Set_string libpath, "<libpath> set libraries path";]
+  Arg.parse (Arg.align [
+			"-t", Arg.Set trace,
+			   	  " Set trace mode";
+			"-v", Arg.Unit (fun ()-> Printf.printf "%s\n" welcome; exit(0)),
+			      " Display version infomation";
+			"-lib", Arg.Set_string libpath,
+					  "libpath  Set libraries path";
+		])
     (fun x -> files := !files @ [x])
-		"Usage: gdispl <options> filename1 filename2 ...\noptions are:";
+		usage;
 	let db = ref (consult1 (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
 	!files|> List.iter(fun x ->
 		db := consult1 !db (Atom x)
