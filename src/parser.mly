@@ -1,6 +1,9 @@
 %{
 open Syntax
-let xe = ""
+let opconvert t =
+  match exp t with
+  | Pred(":-",p) -> Pred(":-",p)
+  | a -> Pred(":-",[a;Atom "true"])
 %}
 %token <string> ATOM
 %token <float> NUMBER
@@ -16,15 +19,15 @@ let xe = ""
 %start sentence
 %type <Syntax.t> sentence
 %%
-query:    | exp DOT                    { opconvert $1 }
+query:    | exp DOT                    { exp $1 }
 sentence: | EOF                        { Atom "" }
-          | exp DOT                    { opconvert $1 }
+          | exp DOT                    { exp $1 }
 exp:      | exp1                       { $1 }
           | exp1 exp                   { Pred("",[$1;$2]) }
           | exp1 COMMA exp             { Pred("",[$1;Pred("",[Atom(",");$3])]) }
 exp1:     | ATOM LPAREN exps RPAREN    { Pred($1, $3) }
           | ATOM                       { Atom($1) }
-          | VAR                        { Var($1,1) }
+          | VAR                        { Var($1,0) }
           | NUMBER                     { Number($1) }
           | STR                        { Str($1) }
           | LBRACKET listbody RBRACKET { $2 }

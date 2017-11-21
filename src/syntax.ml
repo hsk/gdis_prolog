@@ -183,7 +183,7 @@ let rec exp_pre p = function
 		let (t,ts) = (exp_pre 10000 (Pred("",xs))) in
 		exp_infix p t y
 	| Pred("",[x;y]) -> exp_infix p x y
-	| Pred(a,s) -> (Pred(a,List.map opconvert s),Atom"")
+	| Pred(a,s) -> (Pred(a,List.map exp s),Atom"")
 	| e -> (e, Atom "")
 
 and exp_infix p t = function
@@ -196,6 +196,6 @@ and exp_infix p t = function
 	| Pred("",[Atom(op);y]) when postfixs op <= p ->
 		exp_infix p (Pred(op,[t])) y
 	| tokens -> (t,tokens)
-and opconvert e =
+and exp e =
   let a = exp_pre 10000 e in
   fst a
