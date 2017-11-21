@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.2
+# GDIS Prolog verion 0.1.3
 
 GDIS Prolog はコンパクトであることを目標にした Prolog インタプリンタです。
 
@@ -55,6 +55,10 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/11/21 version 0.1.3
+
+- ユーザー定義演算子をop/3 で以下のように定義して使うことができるようになりました:
 
 ## 2017/11/21 version 0.1.2
 
