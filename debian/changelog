@@ -1,3 +1,13 @@
+gdis-prolog (0.1.4) zesty; urgency=medium
+
+  * added goal_expansion/2 macro
+  * fix db bug
+  * fix foldl bug
+  * added reverse/3, var/1
+  * added regular tree grammer (rtg) example
+
+ -- sakurai <sakurai777@gmail.com>  Sat, 25 Nov 2017 19:23:02 +0900
+
 gdis-prolog (0.1.3) zesty; urgency=medium
 
   * added term_expansion/2 macro 
