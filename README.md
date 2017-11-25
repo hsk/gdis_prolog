@@ -65,7 +65,11 @@ sudo make uninstall
 - =../2 (univ) を追加
 - goal_expansion/2 を追加
 - rtg.pl を追加
- 
+- append/3 を追加
+- var/1 を追加
+- foldl のバグ修正
+- DB登録時のバグ修正(copy_termを登録時にするようにしてレベルを下げた)
+
 ## 2017/11/21 version 0.1.3
 
 - term_expansion/2 マクロを以下のように使うことができるようになりました:

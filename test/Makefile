@@ -11,6 +11,8 @@ test:
 	../gdispl -lib ../lib findall.pl > result.txt && diff result.txt results/findall.txt
 	../gdispl -lib ../lib goal_expansion.pl > result.txt && diff result.txt results/goal_expansion.txt
 	../gdispl -lib ../lib univ.pl > result.txt && diff result.txt results/univ.txt
+	../gdispl -lib ../lib append.pl > result.txt && diff result.txt results/append.txt
+	../gdispl -lib ../lib var.pl > result.txt && diff result.txt results/var.txt
 	../gdispl -lib ../lib ../examples/cut.pl > result.txt && diff result.txt results/cut.txt
 	../gdispl -lib ../lib ../examples/eval2.pl > result.txt && diff result.txt results/eval2.txt
 	../gdispl -lib ../lib ../examples/eval3.pl > result.txt && diff result.txt results/eval3.txt
@@ -31,6 +33,8 @@ test:
 	rm -rf result.txt
 	@echo "test ok"
 mkresults:
+	../gdispl -lib ../lib append.pl > results/append.txt
+	../gdispl -lib ../lib var.pl > results/var.txt
 	../gdispl -lib ../lib comment.pl > results/comment.txt
 	../gdispl -lib ../lib comment2.pl > results/comment2.txt
 	../gdispl -lib ../lib call.pl > results/call.txt

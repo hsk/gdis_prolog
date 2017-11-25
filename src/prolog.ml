@@ -130,25 +130,28 @@ let consult1 process solve d t =
 		| Atom "" -> d
 		| p -> 
 			let v = Var("_",-1) in
-			let p = match solve([Pred("term_expansion",[p;v])], d, -1, []) with
-				| Succ(g,d,i,s) -> deref (e s) v
-				| Fail d -> p
+			let (p,d) = match solve([Pred("term_expansion",[p;v])], d, -1, []) with
+				| Succ(g,d,i,s) -> (deref (e s) v,d)
+				| Fail d -> (p,d)
 			in
 			(* goal_expansion *)
-			let rec goal_expansion p =
+			let rec goal_expansion p d =
 				match solve([Pred("goal_expansion",[p;v])], d, -1, []) with
-				| Succ(g,d,i,s) -> goal_expansion (deref (e s) v)
+				| Succ(g,d,i,s) -> goal_expansion (deref (e s) v) d
 				| Fail d ->
 					match p with
 					| Pred ("," as n, [a;b]) 
 					| Pred (";" as n, [a;b])
-					| Pred ("->" as n, [a;b]) -> Pred(n, [goal_expansion a;goal_expansion b])
-					| t            -> t
+					| Pred ("->" as n, [a;b]) ->
+						let a,d = goal_expansion a d in
+						let b,d = goal_expansion b d in
+						Pred(n, [a;b]),d
+					| t            -> t,d
 			in
-			let p = match p with
-			| Pred (":-",[h;goal]) -> Pred(":-",[h;goal_expansion goal])
-			| Pred (":-",[goal]) -> Pred(":-",[goal_expansion goal])
-			| p -> p
+			let p,d = match p with
+			| Pred (":-",[h;goal]) -> let g,d= goal_expansion goal d in Pred(":-",[h;g]),d
+			| Pred (":-",[goal]) -> let g,d= goal_expansion goal d in Pred(":-",[g]),d
+			| p -> p,d
 			in
 			loop (assertz process d p)
 	in loop d
@@ -173,6 +176,7 @@ let univ m s a b =
 	| Pred(a,ts), t, m -> uni m s t (Pred("[|]",[Atom a;list2pred ts]))
 	| Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
 	| _,_,(_,d,_,_) -> Fail d
+
 let rec solve m =
   let rec step = function
   | Fail d     -> Fail d
@@ -199,6 +203,7 @@ let rec solve m =
     | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 process solve d (deref (e s) t), i, s))
 		| Pred("integer", [t])::g, d, -1, s -> step (match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("atom",    [t])::g, d, -1, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
+		| Pred("var",     [t])::g, d, -1, s -> step (match deref (e s) t with Var _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("call",      t)::g, d, -1, s -> step (call t g d (-1) s)
 		| Pred("op",[p;m;ls]) ::g, d, -1, s -> opadd s p m ls; step (Succ(g,d,-1,s))
 		| Pred("=..",[a;b])   ::g, d, -1, s -> step (univ m s a b)
@@ -207,7 +212,7 @@ let rec solve m =
 			if i==0 then step (pop m) else
 			if Array.length d <= i then Fail d else
       match d.(i) with
-      | (Pred(":-", [t2; t3]),nx) ->
+			| (Pred(":-", [t2; t3]),nx) ->
         let e,l1 = el1 s in
         let rec gen_t = function
           | Pred(n, ts) -> Pred(n, List.map (fun a -> gen_t a) ts)

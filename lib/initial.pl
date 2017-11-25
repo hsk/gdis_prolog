@@ -2,6 +2,9 @@ assert(A) :- assertz(A).
 nl :- write('\n').
 writeln(A) :- write(A),nl.
 
+append([],B,B).
+append([A|AS],B,[A|B_]) :- append(AS,B,B_).
+
 member(A,[A|B]).
 member(A,[C|B]) :- member(A,B).
 
@@ -18,8 +21,8 @@ reverse(A,R) :- reverse1(A,[],R).
 reverse1([],R,R).
 reverse1([A|AS],B,R) :- reverse1(AS,[A|B],R).
 
-foldl(A,R,[],R).
-foldl(A,R,[X|XS],R2) :- call(A,X,R,R1),foldl(A,R1,XS,R2).
+foldl(A,[],R,R).
+foldl(A,[X|XS],R,R2) :- call(A,X,R,R1),foldl(A,XS,R1,R2).
 
 forall(A,B) :- call(A),call(B),fail;true.
 
@@ -30,4 +33,4 @@ findall1(A,B,R) :- asserta(findall1([])),
   retract(findall1(Z)).
 findall2(A):-findall1(L),retract(findall1(L)),asserta(findall1([A|L])).
 
-discontiguous(A) :- writeln(A),true.
+discontiguous(A).

@@ -1,3 +1,3 @@
-add(A,B,C) :- C is A + B.
+add(A,B,[A|B]).
 
-:- foldl(add,0,[1,2,3],R),writeln(R),halt.
+:- foldl(add,[1,2,3],[4],R),writeln(R),halt.

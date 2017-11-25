@@ -1,0 +1,16 @@
+:- append([],[],R),writeln(R).
+:- append([1],[],R),writeln(R).
+:- append([1,2],[],R),writeln(R).
+:- append([1,2,3],[],R),writeln(R).
+:- append([],[1],R),writeln(R).
+:- append([1],[1],R),writeln(R).
+:- append([1,2],[1],R),writeln(R).
+:- append([1,2,3],[1],R),writeln(R).
+:- append([],[1,2],R),writeln(R).
+:- append([1],[1,2],R),writeln(R).
+:- append([1,2],[1,2],R),writeln(R).
+:- append([1,2,3],[1,2],R),writeln(R).
+:- append([1,2,3],[4,5],[1,2,3|R]),writeln(R).
+:- append(R,[4,5],[1,2,3,4,5]),writeln(R).
+:- append([1,2,3],R,[1,2,3,4,5]),writeln(R).
+:- halt.
