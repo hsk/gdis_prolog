@@ -33,11 +33,13 @@ rule token = parse
   | "!"                  { OP("!") }
   | "*/"                 { failwith "found */ error." }
   | op+     as s         { OP s }
+  | atom   as s '('          { ATOM_LPAREN s }
+  | "'" (satom as s) "'" '(' { ATOM_LPAREN (Scanf.unescaped s) }
   | atom   as s          { ATOM s }
+  | "'" (satom as s) "'" { ATOM (Scanf.unescaped s) }
   | var    as s          { VAR s }
   | number as s          { NUMBER (float_of_string s) }
   | '"' (str as s) '"'   { STR (Scanf.unescaped s) }
-  | "'" (satom as s) "'" { ATOM (Scanf.unescaped s) }
   | eof                  { EOF }
   | _                    { token lexbuf }
 and comment = parse

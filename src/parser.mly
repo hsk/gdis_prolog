@@ -27,7 +27,7 @@ and opconvert_post p t = function
 		opconvert_post p (Pred(op,[t])) y
 	| tokens -> (t,tokens)
 %}
-%token <string> ATOM
+%token <string> ATOM %token <string> ATOM_LPAREN
 %token <float> NUMBER
 %token <string> STR
 %token <string> VAR
@@ -55,7 +55,7 @@ exp3:     | exp2                        { $1 }
           | COMMA                       { Atom(",") }
 exp2:     | exp1                        { $1 }
           | BAR                         { Atom("|") }
-exp1:     | ATOM LPAREN exp2body RPAREN { Pred($1, $3) }
+exp1:     | ATOM_LPAREN exp2body RPAREN { Pred($1, $2) }
           | ATOM                        { Atom($1) }
           | VAR                         { Var($1,0) }
           | NUMBER                      { Number($1) }
