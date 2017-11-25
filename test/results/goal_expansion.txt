@@ -1,0 +1,5 @@
+writeln(bbb)
+a
+b
+bbb
+halt

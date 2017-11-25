@@ -35,9 +35,9 @@ let () =
 		])
     (fun x -> files := !files @ [x])
 		usage;
-	let db = ref (consult1 (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
+	let db = ref (consult (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
 	!files|> List.iter(fun x ->
-		db := consult1 !db (Atom x)
+		db := consult !db (Atom x)
 	);
 	interactive := true;
   Printf.printf "%s\n%!" (String.make (String.length welcome) '-');

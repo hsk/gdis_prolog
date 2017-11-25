@@ -109,13 +109,14 @@ let opadd s p a ls =
 	| Number p, Atom a, ls -> Syntax.opadd(int_of_float p, a, ls)
 	| _ -> ()
 
-let rec assertz d = function
+let assertz process d = function
   | Pred(":-", [t]) -> process d t
 	| t               -> Db.assertz d (to_db t)
-and asserta d = function
+let asserta process d = function
 	| Pred(":-", [t]) -> process d t
 	| t               -> Db.asserta d (to_db t)
-and consult1 d t =
+
+let consult1 process solve d t =
 	let filename = match t with
 	| Atom a -> a
 	| Pred("library",[Atom t]) -> !libpath ^ "/" ^ t ^ ".pl"
@@ -126,18 +127,36 @@ and consult1 d t =
 	let lexer = Lexing.from_channel inp in
 	let rec loop d =
 		match Parser.sentence Lexer.token lexer with
-		| Atom _ -> d
+		| Atom "" -> d
 		| p -> 
 			let v = Var("_",-1) in
-			let p1 = Pred("term_expansion",[p;v]) in
-			match solve([p1], d, -1, []) with
-			| Succ(g,d,i,s) -> loop (assertz d (deref (e s) v))
-			| Fail d -> loop (assertz d p)
+			let p = match solve([Pred("term_expansion",[p;v])], d, -1, []) with
+				| Succ(g,d,i,s) -> deref (e s) v
+				| Fail d -> p
+			in
+			(* goal_expansion *)
+			let rec goal_expansion p =
+				match solve([Pred("goal_expansion",[p;v])], d, -1, []) with
+				| Succ(g,d,i,s) -> goal_expansion (deref (e s) v)
+				| Fail d ->
+					match p with
+					| Pred ("," as n, [a;b]) 
+					| Pred (";" as n, [a;b])
+					| Pred ("->" as n, [a;b]) -> Pred(n, [goal_expansion a;goal_expansion b])
+					| t            -> t
+			in
+			let p = match p with
+			| Pred (":-",[h;goal]) -> Pred(":-",[h;goal_expansion goal])
+			| Pred (":-",[goal]) -> Pred(":-",[goal_expansion goal])
+			| p -> p
+			in
+			loop (assertz process d p)
 	in loop d
-and not1 g d s = function
+
+let not1 g d s = function
 	| Fail d -> Succ(g,d,-1,s)
 	| Succ(_,_,_,_) -> Fail d	
-and solve m =
+let rec solve m =
   let rec step = function
   | Fail d     -> Fail d
   | Succ (g,d,i,s as m) ->
@@ -155,12 +174,12 @@ and solve m =
     | Pred("\\=", [u;v])  ::g, d, -1, s -> step (uninot m s u v)
     | Pred("\\", [u])     ::g, d, -1, s -> step (not1 g d s (step(Succ([u], d, -1, []))))
     | Pred("is", [u;v])   ::g, d, -1, s -> step (uni m s u (Number(eval (e s) (deref (e s) v))))
-    | Pred("assertz",  [t])::g, d, -1, s -> step (Succ(g, assertz d (deref (e s) t), -1, s))
-    | Pred("asserta",  [t])::g, d, -1, s -> step (Succ(g, asserta d (deref (e s) t), -1, s))
+    | Pred("assertz",  [t])::g, d, -1, s -> step (Succ(g, assertz process d (deref (e s) t), -1, s))
+    | Pred("asserta",  [t])::g, d, -1, s -> step (Succ(g, asserta process d (deref (e s) t), -1, s))
     | Pred("write",   [t])::g, d, -1, s -> write1 (e s) t; step (Succ(g,d,-1,s))
     | Pred("retract", [t])::g, d, -1, s -> step (Succ(g,retract1 d t (e s),-1,s))
     | Pred("retractall", [t])::g, d, -1, s -> step (Succ(g,retractall d t (e s),-1,s))
-    | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 d (deref (e s) t), i, s))
+    | Pred("consult", [t])::g, d, -1, s -> step (Succ(g, consult1 process solve d (deref (e s) t), i, s))
 		| Pred("integer", [t])::g, d, -1, s -> step (match deref (e s) t with Number _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("atom",    [t])::g, d, -1, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("call",      t)::g, d, -1, s -> step (call t g d (-1) s)
@@ -204,3 +223,4 @@ and process d t =
 			)
   in prove true ([t], d, -1, [[],[],1,-2])
 
+let consult = consult1 process solve
