@@ -29,3 +29,5 @@ findall1(A,B,R) :- asserta(findall1([])),
   findall1(R),
   retract(findall1(Z)).
 findall2(A):-findall1(L),retract(findall1(L)),asserta(findall1([A|L])).
+
+discontiguous(A) :- writeln(A),true.

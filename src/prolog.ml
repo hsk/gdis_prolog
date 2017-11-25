@@ -161,11 +161,15 @@ let rec list2pred = function
 	| [] -> Atom "[]"
 	| x::xs -> Pred("[|]",[x;list2pred xs])
 
+let rec pred2list = function
+	| Atom "[]" -> [] 
+	| Pred("[|]",[x; xs]) -> x::pred2list xs
+
 let univ m s a b =
 	match deref (e s) a, deref (e s) b,m with
 	| Var _,Var _, (_,d,_,_) -> Fail d
-	| (Var _) as t, Pred("[|]",Atom a::b), m ->
-		uni m s t (Pred(a,b))
+	| (Var _) as t, Pred("[|]",[Atom a;b]), m ->
+		uni m s t (Pred(a,pred2list b))
 	| Pred(a,ts), t, m -> uni m s t (Pred("[|]",[Atom a;list2pred ts]))
 	| Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
 	| _,_,(_,d,_,_) -> Fail d

@@ -5,10 +5,10 @@
 term_expansion(A::= syntax, syntax(A)).
 term_expansion(A::=B, A_ :- syntax(A_,M,B)) :- assert(syntax(A)), apply_expansion(A,[M],A_).
 
-%goal_expansion(syntax(A_,M,A),B_) :- syntax_expansion(M,A,B_), writeln(A_ :- B_).
+goal_expansion(syntax(A_,M,A),B_) :- syntax_expansion(M,A,B_), writeln(A_ :- B_).
 goal_expansion(syntax(_,M,A),B_) :- syntax_expansion(M,A,B_).
 
-apply_expansion(A,M,L) :- atom(A), L =.. [A|M].
+apply_expansion(A,M,L) :- atom(A), writeln(a=A;m=M), L =.. [A|M], writeln(l=L).
 apply_expansion(A,M,L) :- A=..B,append(B,M,R), L =.. R.
 
 syntax_expansion(M,A,R) :- var(A),apply_expansion(call,[A,M],R).
