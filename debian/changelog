@@ -1,3 +1,9 @@
+gdis-prolog (0.1.5) zesty; urgency=medium
+
+  * fix parser bug about list 
+
+ -- sakurai <sakurai777@gmail.com>  Sun, 26 Nov 2017 04:13:56 +0900
+
 gdis-prolog (0.1.4) zesty; urgency=medium
 
   * added goal_expansion/2 macro

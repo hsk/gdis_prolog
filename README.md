@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.4
+# GDIS Prolog verion 0.1.5
 
 [![](https://travis-ci.org/hsk/gdis_prolog.svg?style=flat-square)](https://travis-ci.org/hsk/gdis_prolog)
 
