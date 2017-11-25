@@ -156,6 +156,19 @@ let consult1 process solve d t =
 let not1 g d s = function
 	| Fail d -> Succ(g,d,-1,s)
 	| Succ(_,_,_,_) -> Fail d	
+
+let rec list2pred = function
+	| [] -> Atom "[]"
+	| x::xs -> Pred("[|]",[x;list2pred xs])
+
+let univ m s a b =
+	match deref (e s) a, deref (e s) b,m with
+	| Var _,Var _, (_,d,_,_) -> Fail d
+	| (Var _) as t, Pred("[|]",Atom a::b), m ->
+		uni m s t (Pred(a,b))
+	| Pred(a,ts), t, m -> uni m s t (Pred("[|]",[Atom a;list2pred ts]))
+	| Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
+	| _,_,(_,d,_,_) -> Fail d
 let rec solve m =
   let rec step = function
   | Fail d     -> Fail d
@@ -184,6 +197,7 @@ let rec solve m =
 		| Pred("atom",    [t])::g, d, -1, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
 		| Pred("call",      t)::g, d, -1, s -> step (call t g d (-1) s)
 		| Pred("op",[p;m;ls]) ::g, d, -1, s -> opadd s p m ls; step (Succ(g,d,-1,s))
+		| Pred("=..",[a;b])   ::g, d, -1, s -> step (univ m s a b)
 		|                       g, d, -1, s -> step (Succ(g, d, Db.get_start d, s))
 		|                    t::g, d,  i, s ->
 			if i==0 then step (pop m) else

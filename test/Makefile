@@ -10,6 +10,7 @@ test:
 	../gdispl -lib ../lib retract.pl > result.txt && diff result.txt results/retract.txt
 	../gdispl -lib ../lib findall.pl > result.txt && diff result.txt results/findall.txt
 	../gdispl -lib ../lib goal_expansion.pl > result.txt && diff result.txt results/goal_expansion.txt
+	../gdispl -lib ../lib univ.pl > result.txt && diff result.txt results/univ.txt
 	../gdispl -lib ../lib ../examples/cut.pl > result.txt && diff result.txt results/cut.txt
 	../gdispl -lib ../lib ../examples/eval2.pl > result.txt && diff result.txt results/eval2.txt
 	../gdispl -lib ../lib ../examples/eval3.pl > result.txt && diff result.txt results/eval3.txt
@@ -41,6 +42,7 @@ mkresults:
 	../gdispl -lib ../lib retract.pl > results/retract.txt
 	../gdispl -lib ../lib findall.pl > results/findall.txt
 	../gdispl -lib ../lib goal_expansion.pl > results/goal_expansion.txt
+	../gdispl -lib ../lib univ.pl > results/univ.txt
 	../gdispl -lib ../lib ../examples/cut.pl > results/cut.txt
 	../gdispl -lib ../lib ../examples/eval2.pl > results/eval2.txt
 	../gdispl -lib ../lib ../examples/eval3.pl > results/eval3.txt
