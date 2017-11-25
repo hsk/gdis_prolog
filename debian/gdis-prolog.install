@@ -1,2 +1,3 @@
 gdispl usr/bin
 lib/initial.pl usr/share/gdispl/lib
+lib/rtg.pl usr/share/gdispl/lib
