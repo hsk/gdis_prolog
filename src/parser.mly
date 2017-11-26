@@ -41,33 +41,33 @@ and opconvert_post p t = function
 %start sentence
 %type <Syntax.t> sentence
 %%
-query:    | exp DOT                     { opconvert $1 }
+query:    | body3 DOT                   { opconvert $1 }
 sentence: | EOF                         { Atom "" }
-          | exp DOT                     { opconvert $1 }
-exp:      | exp3s                       { $1 }
-exp3s:    | exp3                        { $1 }
-          | exp3 exp3s                  { Pred("",[$1;$2]) }
-exp2s:    | exp2                        { $1 }
-          | exp2 exp2s                  { Pred("",[$1;$2]) }
-exp1s:    | exp1                        { $1 }
-          | exp1 exp1s                  { Pred("",[$1;$2]) }
+          | body3 DOT                   { opconvert $1 }
+body3:    | op3                         { $1 }
+body2:    | /* empty */                 { [] }
+          | op2                         { [$1] }
+          | op2 COMMA body2             { $1::$3 }
+body1:    | /* empty */                 { Atom "[]" }
+          | op1                         { Pred("[|]",[$1;Atom"[]"]) }
+          | op1 COMMA body1             { Pred("[|]",[$1;$3])}
+          | op1 BAR body3               { Pred("[|]",[$1;$3])}
+op3:      | exp3                        { $1 }
+          | exp3 op3                    { Pred("",[$1;$2]) }
+op2:      | exp2                        { $1 }
+          | exp2 op2                    { Pred("",[$1;$2]) }
+op1:      | exp1                        { $1 }
+          | exp1 op1                    { Pred("",[$1;$2]) }
 exp3:     | exp2                        { $1 }
           | COMMA                       { Atom(",") }
 exp2:     | exp1                        { $1 }
           | BAR                         { Atom("|") }
-exp1:     | ATOM_LPAREN exp2body RPAREN { Pred($1, $2) }
+exp1:     | ATOM_LPAREN body2 RPAREN    { Pred($1, $2) }
           | ATOM                        { Atom($1) }
           | VAR                         { Var($1,0) }
           | NUMBER                      { Number($1) }
           | STR                         { Str($1) }
-          | LBRACKET exp1body RBRACKET  { $2 }
-          | LPAREN exp RPAREN           { Pred("",[$2;Atom""]) }
-          | LBRACE exp RBRACE           { Pred("{}",[$2]) }
+          | LBRACKET body1 RBRACKET     { $2 }
+          | LPAREN body3 RPAREN         { Pred("",[$2;Atom""]) }
+          | LBRACE body3 RBRACE         { Pred("{}",[$2]) }
           | OP                          { Atom($1) }
-exp2body: | /* empty */                 { [] }
-          | exp2s                       { [$1] }
-          | exp2s COMMA exp2body        { $1::$3 }
-exp1body: | /* empty */                 { Atom "[]" }
-          | exp1s                       { Pred("[|]",[$1;Atom"[]"]) }
-          | exp1s COMMA exp1body        { Pred("[|]",[$1;$3])}
-          | exp1s BAR exp               { Pred("[|]",[$1;$3])}
