@@ -15,9 +15,9 @@ VSCode プラグインを作るのも目標の１つです。簡単なPrologの�
 
 ## 特徴
 
-- 小さなプログラム
-- OCaml による綺麗な実装
-- OCamlYacc による構文解析と下降型演算子順位法によるユーザー定義演算子
+* 小さなプログラム
+* OCaml による綺麗な実装
+* OCamlYacc による構文解析と下降型演算子順位法によるユーザー定義演算子
 
 # Install
 
@@ -58,21 +58,25 @@ sudo make uninstall
 
 # Change history
 
-## 2017/11/21 version 0.1.4
+## 2017/11/26 version 0.1.5
 
-- コメントアウトされていたテストコードをマクロを使ったものに書き換えました。
-- リファクタリング
-- =../2 (univ) を追加
-- goal_expansion/2 を追加
-- rtg.pl を追加
-- append/3 を追加
-- var/1 を追加
-- foldl のバグ修正
-- DB登録時のバグ修正(copy_termを登録時にするようにしてレベルを下げた)
+* パーサのリファクタリング
+
+## 2017/11/25 version 0.1.4
+
+* コメントアウトされていたテストコードをマクロを使ったものに書き換えました。
+* リファクタリング
+* =../2 (univ) を追加
+* goal_expansion/2 を追加
+* rtg.pl を追加
+* append/3 を追加
+* var/1 を追加
+* foldl のバグ修正
+* DB登録時のバグ修正(copy_termを登録時にするようにしてレベルを下げた)
 
 ## 2017/11/21 version 0.1.3
 
-- term_expansion/2 マクロを以下のように使うことができるようになりました:
+* term_expansion/2 マクロを以下のように使うことができるようになりました:
 
     ```prolog
     :- op(1200,xfx,--).
@@ -92,7 +96,7 @@ sudo make uninstall
 
 ## 2017/11/21 version 0.1.2
 
-- ユーザー定義演算子をop/3 で以下のように定義して使うことができるようになりました:
+* ユーザー定義演算子をop/3 で以下のように定義して使うことができるようになりました:
 
     ```prolog
     :- op(600,xfy,add).
@@ -111,13 +115,13 @@ sudo make uninstall
     25
     ```
 
-- -v オプションで以下のようにバージョン情報の表示をするようになりました:
+* -v オプションで以下のようにバージョン情報の表示をするようになりました:
 
     ```bash
     $ gdispl -v
     GDIS Prolog version 0.1.2
     ```
-- --help オプションのヘルプ表示は以下のようにアラインを合わせて綺麗に表示するようになりました:
+* --help オプションのヘルプ表示は以下のようにアラインを合わせて綺麗に表示するようになりました:
 
     ```bash
     $ gdispl --help
@@ -132,9 +136,9 @@ sudo make uninstall
 
 ## 2017/11/21 version 0.1.1
 
-- 演算子の優先順位を変更可能にするために独自拡張機能を一旦なくしました。
-- 構文解析は1文ごとに処理して、リストを返さなくしました。
-- パーサは演算子の組み換えができる構造に変わりました。
+* 演算子の優先順位を変更可能にするために独自拡張機能を一旦なくしました。
+* 構文解析は1文ごとに処理して、リストを返さなくしました。
+* パーサは演算子の組み換えができる構造に変わりました。
 
 ## 2017/11/20 version 0.1.0
 
@@ -148,64 +152,64 @@ sudo apt install gdispl
 
 ## 2017/11/20 version 0.0.9
 
-- PPA 登録テスト
+* PPA 登録テスト
 
 ## 2017/11/20 version 0.0.8
 
-- PPA 登録テスト
+* PPA 登録テスト
 
 ## 2017/11/20 version 0.0.7
 
-- 複数の:-/1述語で問題なく動作するように
-- nop/0 を true/0 に変更
-- forall/2 を追加
-- reverse/2 を追加
-- retract/1 を追加
-- asserta/1 を追加
-- retractall/1 を追加
-- リスト表示バグ修正
+* 複数の:-/1述語で問題なく動作するように
+* nop/0 を true/0 に変更
+* forall/2 を追加
+* reverse/2 を追加
+* retract/1 を追加
+* asserta/1 を追加
+* retractall/1 を追加
+* リスト表示バグ修正
 
 ## 2017/11/18 version 0.0.6
 
-- '\\'/1 を追加
+* '\\'/1 を追加
 
 ## 2017/11/17 version 0.0.5
 
-- リストのライブラリを追加
-  - member/2 を追加
-  - call/1 を追加
-  - maplist/2,maplist/3,maplist/4 を追加
-  - foldl/4 を追加
-- [GDIS Prolog 仕様](https://github.com/hsk/gdis_prolog/blob/master/docs/README.md) を追加
-- [ライブラリリファレンス](https://github.com/hsk/gdis_prolog/blob/master/docs/library.md) を追加
+* リストのライブラリを追加
+  * member/2 を追加
+  * call/1 を追加
+  * maplist/2,maplist/3,maplist/4 を追加
+  * foldl/4 を追加
+* [GDIS Prolog 仕様](https://github.com/hsk/gdis_prolog/blob/master/docs/README.md) を追加
+* [ライブラリリファレンス](https://github.com/hsk/gdis_prolog/blob/master/docs/library.md) を追加
 
 ## 2017/11/17 version 0.0.4
 
-- README を修正
-- examples/eval3.pl を修正
-- examples/lambda.pl を追加
-- docs/README.md にBNF定義を追加
-- testファイルを追加
-- 空白行が続いた時の構文解析の仕様変更
+* README を修正
+* examples/eval3.pl を修正
+* examples/lambda.pl を追加
+* docs/README.md にBNF定義を追加
+* testファイルを追加
+* 空白行が続いた時の構文解析の仕様変更
 
 ## 2017/11/17 version 0.0.3
 
-- README を修正
-- Scala版とProlog版をlabディレクトリに移動
-- test ディレクトリ名を examples に変更
-- examples/eval3.pl を修正
+* README を修正
+* Scala版とProlog版をlabディレクトリに移動
+* test ディレクトリ名を examples に変更
+* examples/eval3.pl を修正
 
 ## 2017/11/17 version 0.0.2
 
-- make install make uninstall を追加しました。
-- OCaml版を正式に採用することにしてディレクトリ配置を変更しました。
-- TODOリストはissue listに移動させました。
-- develop ブランチを切ってそちらで開発を進めてから、masterにmergeすることにしました。
+* make install make uninstall を追加しました。
+* OCaml版を正式に採用することにしてディレクトリ配置を変更しました。
+* TODOリストはissue listに移動させました。
+* develop ブランチを切ってそちらで開発を進めてから、masterにmergeすることにしました。
 
 ## 2017/11/17 version 0.0.1 
 
-- 久しぶりに更新。 integer/1 述語を追加しました。
-- バージョン管理するようにしました。
+* 久しぶりに更新。 integer/1 述語を追加しました。
+* バージョン管理するようにしました。
 
 ## ライセンス
 

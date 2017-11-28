@@ -15,7 +15,7 @@ digit       ::= ['0'-'9']
 atom        ::= lower (lower|upper|digit|'_'|'`')*
 VAR         ::= upper (lower|upper|digit|'_'|'`')*
 nonendl     ::= [^'\n']*
-number      ::= digit+ ('.' digit+)? 
+num         ::= digit+ ('.' digit+)? 
 str         ::= ([^ '"' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '"'])*
 satom       ::= ([^ '\'' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '\''])*
 op          ::= ";" | "," | "=" | "is" | "+" | "-" | "*" | "/" | "\\="
@@ -28,7 +28,7 @@ comment     ::= "%" nonendl
 DOT         ::= ln2 ln2+ '.'? ln2* | "." ln2*
 LINE        ::= '-' '-'+ com?
 ATOM        ::= atom | "!" | "'" (satom as s) "'"
-NUMBER      ::= number
+NUM         ::= num
 STR         ::= '"' (str as s) '"'
 ```
 
@@ -54,7 +54,7 @@ exp1       ::= exp OP exp1
 exp        ::= ATOM "(" exps ")"
              | ATOM
              | var
-             | NUMBER
+             | NUM
              | STR
              | "[" listbody "]"
              | "(" term ")"

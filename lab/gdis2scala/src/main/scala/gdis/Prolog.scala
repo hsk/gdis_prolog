@@ -67,7 +67,7 @@ object Prolog {
       case (_, m) => pop(m)
     }
   def eval(e:E,t:T):Float = t match {
-    case Number(i) => i
+    case Num(i) => i
     case Pred("+", List(x,y)) => eval(e, x) + eval(e, y)
     case Pred("*", List(x,y)) => eval(e, x) * eval(e, y)
     case Pred("-", List(x,y)) => eval(e, x) - eval(e, y)
@@ -108,7 +108,7 @@ object Prolog {
         case (Pred(",", List(u, v)) :: g, d, -1, s) => step(Succ(u :: v :: g, d, -1, s))
         case (Pred(";", List(u, v)) :: g, d, -1, s) => step(Succ(u :: g, d, -1, (v :: g, e(s), -1) :: s))
         case (Pred("=", List(u, v)) :: g, d, -1, s) => step(uni(m, s, u, v))
-        case (Pred("is", List(u, v)) :: g, d, -1, s) => step(uni(m, s, u, Number(eval(e(s), deref(e(s), v)))))
+        case (Pred("is", List(u, v)) :: g, d, -1, s) => step(uni(m, s, u, Num(eval(e(s), deref(e(s), v)))))
         case (Pred("assert", List(t)) :: g, d, -1, s) => step(Succ((g, assert1(d, deref(e(s), t)), i, s)))
         case (Pred("write", List(t)) :: g, d, -1, s) => write1(e(s), t); step(Succ(g, d, -1, s))
         case (Pred("consult", List(t)) :: g, d, -1, s) => step(Succ((g, consult1(d, deref(e(s), t)), i, s)))

@@ -22,19 +22,19 @@ let id = ref 0
 let newvar() = incr id; Var("%"^string_of_int !id,1)
 
 let copy_term p =
-	let t = Hashtbl.create 10 in
-	let rec loop = function
-	| Var (a,i) when Hashtbl.mem t (a,i) -> Hashtbl.find t (a,i)
-	| Var (a,i) -> let v = newvar() in Hashtbl.add t (a,i) v; v
-	| Pred(a,ls) -> Pred(a,List.map loop ls)
-	| a -> a
-	in
-	let p2 = loop p in
-	(*Printf.printf "copy_term %s to %s\n%!" (show p) (show p2);*)
-	p2
+  let t = Hashtbl.create 10 in
+  let rec loop = function
+  | Var (a,i) when Hashtbl.mem t (a,i) -> Hashtbl.find t (a,i)
+  | Var (a,i) -> let v = newvar() in Hashtbl.add t (a,i) v; v
+  | Pred(a,ls) -> Pred(a,List.map loop ls)
+  | a -> a
+  in
+  let p2 = loop p in
+  (*Printf.printf "copy_term %s to %s\n%!" (show p) (show p2);*)
+  p2
 
 let new_free (db:db) p n : (int * db) =
-	let p = copy_term p in
+  let p = copy_term p in
   let free = get_free db in
   if free = 0 then (Array.length db,Array.append db [|p,n|])
   else (
@@ -58,8 +58,8 @@ let assertz (db:db) p =
   db
 
 let remove db n =
-  db.(n) <- (Number (float_of_int (snd db.(0))), snd db.(n));
-  db.(0) <- (Number (float_of_int n), snd db.(0));
+  db.(n) <- (Num (float_of_int (snd db.(0))), snd db.(n));
+  db.(0) <- (Num (float_of_int n), snd db.(0));
   db
 
 let retract db (f:Syntax.t->bool) =

@@ -11,7 +11,7 @@ object Parser extends RegexParsers {
   }
 
   def ATOM     = """[a-z][a-zA-Z0-9_]*|'([^'\\]|\\')*'|!""".r
-  def NUMBER   = """[0-9]+(\.[0-9]+)?""".r       ^^ { case a     => a.toFloat }
+  def NUM      = """[0-9]+(\.[0-9]+)?""".r       ^^ { case a     => a.toFloat }
   def STR      = "\""~"""([^"\\]|\\.)*""".r~"\"" ^^ { case a~b~c => StringContext.treatEscapes(b) }
   def VAR      = """[A-Z][a-zA-Z0-9_]*""".r
   def OP3       = """[+\-]""".r
@@ -53,7 +53,7 @@ object Parser extends RegexParsers {
   def exp          = (ATOM~LPAREN~exps~RPAREN    ^^ { case a~b~c~d => Pred(a, c) }).
                    | (ATOM                       ^^ { case a       => Atom(a) }).
                    | (VAR                        ^^ { case a       => Var(a, 0) }).
-                   | (NUMBER                     ^^ { case a       => Number(a) }).
+                   | (NUM                     ^^ { case a       => Num(a) }).
                    | (STR                        ^^ { case a       => Str(a) }).
                    | (LBRACKET~listbody~RBRACKET ^^ { case a~b~c   => b }).
                    | (LPAREN~term~RPAREN         ^^ { case a~b~c   => b })

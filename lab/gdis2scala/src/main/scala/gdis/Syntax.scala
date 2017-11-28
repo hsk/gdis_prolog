@@ -6,14 +6,14 @@ object Syntax {
 
   sealed trait T
   case class Atom(_1: String) extends T
-  case class Number(_1: Float) extends T
+  case class Num(_1: Float) extends T
   case class Str(_1: String) extends T
   case class Pred(_1: String, _2:List[T]) extends T
   case class Var(_1: V) extends T
 
   def show(t:T):String = t match {
     case Atom(n)      => n
-    case Number(v)    => v.toString
+    case Num(v)       => v.toString
     case Str(v)       => v
     case Pred(".", _) => "[%s]".format(show_list(t))
     case Pred(n, xs)  => "%s(%s)".format(n, xs.map(show).mkString(", "))

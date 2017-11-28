@@ -7,7 +7,7 @@ let digit = ['0'-'9']
 let atom = lower (lower|upper|digit|'_'|'`')*
 let var = ('_'|upper) (lower|upper|digit|'_'|'`')*
 let nonendl = [^'\n']*
-let number = digit+ ('.' digit+)? 
+let num = digit+ ('.' digit+)? 
 let str = ([^ '"' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '"'])*
 let satom = ([^ '\'' '\\'] | '\\' ['\\' '/' 'b' 'f' 'n' 'r' 't' '\''])*
 
@@ -25,8 +25,8 @@ rule token = parse
   | ","                  { COMMA }
   | "("                  { LPAREN }
   | ")"                  { RPAREN }
-  | "["                  { LBRACKET }
-  | "]"                  { RBRACKET }
+  | "["                  { LBRACK }
+  | "]"                  { RBRACK }
   | "{"                  { LBRACE }
   | "}"                  { RBRACE }
   | "."                  { DOT }
@@ -35,7 +35,7 @@ rule token = parse
   | op+     as s         { OP s }
   | atom   as s          { ATOM s }
   | var    as s          { VAR s }
-  | number as s          { NUMBER (s) }
+  | num as s             { NUM (s) }
   | '"' (str as s) '"'   { STR (Scanf.unescaped s) }
   | "'" (satom as s) "'" { ATOM (Scanf.unescaped s) }
   | eof                  { EOF }

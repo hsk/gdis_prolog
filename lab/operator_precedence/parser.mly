@@ -3,11 +3,11 @@ open Syntax
 let xe = ""
 %}
 %token <string> ATOM
-%token <string> NUMBER
+%token <string> NUM
 %token <string> STR
 %token <string> VAR
 %token <string> OP
-%token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
+%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
 %token COMMA BAR DOT
 %token EOF
 %token <string> COMMENT
@@ -25,9 +25,9 @@ exp:      | exp1                       { $1 }
 exp1:     | ATOM LPAREN exps RPAREN    { Pred($1, $3) }
           | ATOM                       { Atom($1) }
           | VAR                        { Var($1) }
-          | NUMBER                     { Number($1) }
+          | NUM                        { Num($1) }
           | STR                        { Str($1) }
-          | LBRACKET listbody RBRACKET { $2 }
+          | LBRACK listbody RBRACK     { $2 }
           | LPAREN exp RPAREN          { Pred("",[$2;Atom""]) }
           | LBRACE exp RBRACE          { Pred("{}",[$2]) }
           | OP                         { Atom($1) }

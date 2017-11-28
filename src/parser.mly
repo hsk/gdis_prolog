@@ -28,11 +28,11 @@ and opconvert_post p t = function
   | tokens -> (t,tokens)
 %}
 %token <string> ATOM %token <string> ATOM_LPAREN
-%token <float> NUMBER
+%token <float> NUM
 %token <string> STR
 %token <string> VAR
 %token <string> OP
-%token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
+%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
 %token COMMA BAR DOT
 %token EOF
 %token <string> COMMENT
@@ -51,7 +51,7 @@ expr2:    | /* empty */              { [] }
 expr1:    | /* empty */              { Atom "[]" }
           | term1                    { Pred("[|]",[$1;Atom"[]"]) }
           | term1 COMMA expr1        { Pred("[|]",[$1;$3]) }
-          | term1 BAR expr3          { Pred("[|]",[$1;$3]) }
+          | term1 BAR   expr3        { Pred("[|]",[$1;$3]) }
 term3:    | fact3                    { $1 }
           | fact3 term3              { Pred("",[$1;$2]) }
 term2:    | fact2                    { $1 }
@@ -62,12 +62,12 @@ fact3:    | fact2                    { $1 }
           | COMMA                    { Atom(",") }
 fact2:    | fact1                    { $1 }
           | BAR                      { Atom("|") }
-fact1:    | ATOM_LPAREN expr2 RPAREN { Pred($1, $2) }
-          | ATOM                     { Atom($1) }
+fact1:    | ATOM                     { Atom($1) }
           | VAR                      { Var($1,0) }
-          | NUMBER                   { Number($1) }
+          | NUM                      { Num($1) }
           | STR                      { Str($1) }
-          | LBRACKET expr1 RBRACKET  { $2 }
-          | LPAREN expr3 RPAREN      { Pred("",[$2;Atom""]) }
-          | LBRACE expr3 RBRACE      { Pred("{}",[$2]) }
           | OP                       { Atom($1) }
+          |      LBRACK expr1 RBRACK { $2 }
+          | ATOM_LPAREN expr2 RPAREN { Pred($1, $2) }
+          |      LPAREN expr3 RPAREN { Pred("",[$2;Atom""]) }
+          |      LBRACE expr3 RBRACE { Pred("{}",[$2]) }

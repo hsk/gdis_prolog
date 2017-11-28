@@ -2,7 +2,7 @@ type x = string
 
 type t =
   | Atom of x
-  | Number of float
+  | Num of float
   | Str of x
   | Pred of x * t list
   | Var of (x * int)
@@ -59,7 +59,7 @@ let _ = init_ops ()
 
 let rec show1 = function
   | Atom(x)     -> Printf.sprintf "Atom(%S)" x
-  | Number(n)   -> Printf.sprintf "Number(%f)" n
+  | Num(n)   -> Printf.sprintf "Num(%f)" n
   | Str(x)      -> Printf.sprintf "Str(%S)" x
   | Pred(x, xs) -> Printf.sprintf "Pred(%S,[%s])" x (show1s xs)
   | Var(x,i)    -> Printf.sprintf "Var(%s,%d)" x i
@@ -109,7 +109,7 @@ let rec show p = function
   | Atom("!")           -> "!"
   | Atom("[]")          -> "[]"
   | Atom(x)             -> show_atom x
-  | Number(n)           -> let s = string_of_float n in let l = (String.length s)-1 in
+  | Num(n)           -> let s = string_of_float n in let l = (String.length s)-1 in
                            if String.sub s l 1 = "." then String.sub s 0 l else s
   | Str(x)              -> Printf.sprintf "%S" x
   | Pred(x, [xs]) when opnFx x >= p -> Printf.sprintf "(%s %s)" x (show (opnFx x) xs)

@@ -5,7 +5,7 @@
 % syntax
 
 syntax_show(atom(N),       N).
-syntax_show(number(V)    , R) :- atom_number(R,V).
+syntax_show(num(V)    , R) :- atom_number(R,V).
 syntax_show(str(V)      , V).
 syntax_show(pred('.', Ls), R) :- show_list(pred('.', Ls), Lt), format(atom(R), "[~s]", Lt). 
 syntax_show(pred(N, Xs)  , R) :- maplist(syntax_show, Xs, Xs1),
@@ -25,7 +25,7 @@ cnv_find(K=T,[_=T1|Env]) :- T\==T1,cnv_find(K=T,Env).
 
 cnv(Env,T,   atom(T)) :-     atom(T), !.
 cnv(Env,T,var((K,0))) :-      var(T), !, cnv_find(K=T,Env),!.
-cnv(Env,T, number(T)) :-   number(T), !.
+cnv(Env,T,    num(T)) :-   number(T), !.
 cnv(Env,T,    str(T)) :-   string(T), !.
 cnv(Env,T,         R) :-  is_list(T), !, cnv_list(Env,T,R),!.
 cnv(Env,T,pred(N,Ls)) :- T =..[N|Xs], !, maplist(cnv(Env),Xs,Ls),!.
@@ -80,7 +80,7 @@ uni(M,E,T,T2,M2) :-
 	unify((T,T2),E,E2), M=([_|G],D,_,[(Sg, _,L, I)|S]), M2=succ(G, D, -1,[(Sg,E2,L,I)|S])
   ; pop(M,M2).
 
-eval(E, number(I), I).
+eval(E, num(I), I).
 eval(E, var(V), I) :- find(V,E,V2), e(V2,E2), eval(E, E2, I).
 eval(E, pred('+', [T, T2]), I3) :- eval(E, T, I), eval(E, T2, I2), I3 is I + I2.
 eval(E, pred('*', [T, T2]), I3) :- eval(E, T, I), eval(E, T2, I2), I3 is I * I2.
@@ -124,7 +124,7 @@ step1(M,[atom('!')           |G], D, -1, [(G2,E,L,_)|S], R) :- step(succ(G, D, -
 step1(M,[pred(',',  [U,V])   |G], D, -1, S, R) :- step(succ([U,V|G], D, -1, S), R).
 step1(M,[pred(';',  [U,V])   |G], D, -1, S, R) :- el1(S, E, L1), step(succ([U|G], D, -1, [([V|G], E,L1, -1)|S]), R).
 step1(M,[pred('=',  [U,V])   |G], D, -1, S, R) :- e(S, E), uni(M,E,U,V,R1),step(R1, R).
-step1(M,[pred('is', [U,V])   |G], D, -1, S, R) :- e(S, E), deref(E, V, V2), eval(E, V2, N), !, uni(M,E,U,number(N),R1), step(R1,R).
+step1(M,[pred('is', [U,V])   |G], D, -1, S, R) :- e(S, E), deref(E, V, V2), eval(E, V2, N), !, uni(M,E,U,num(N),R1), step(R1,R).
 step1(M,[pred('assert',  [T])|_], D, -1, S, R) :- e(S, E), deref(E, T, T2), assert1(T2, D, D2), step(succ(G, D2, I, S), R).
 step1(M,[pred('write',   [T])|G], D, -1, S, R) :- e(S, E), write1(E, T), step(succ(G, D, -1, S), R).
 step1(M,[pred('consult', [T])|_], D, -1, S, R) :- e(S, E), deref(E, T, T2), consult1(T2, D, D2), step(succ(G, D2, I, S),R).
