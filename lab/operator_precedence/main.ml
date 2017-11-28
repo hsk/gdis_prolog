@@ -1,4 +1,4 @@
-open Syntax
+open Ast
 
 let parse_file filename = 
   let fp = open_in filename in

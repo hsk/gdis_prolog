@@ -1,5 +1,5 @@
 %{
-open Syntax
+open Ast
 let prefixs  = opn 10001 ["fx";"fy"]
 let postfixs = opn 10001 ["xf";"yf"]
 let infixrs  = opn 10001 ["xfy";"xfx"]
@@ -37,9 +37,9 @@ and opconvert_post p t = function
 %token EOF
 %token <string> COMMENT
 %start query
-%type <Syntax.t> query
+%type <Ast.t> query
 %start sentence
-%type <Syntax.t> sentence
+%type <Ast.t> sentence
 %%
 query:    | expr3 DOT                { opconvert $1 }
 sentence: | EOF                      { Atom "" }

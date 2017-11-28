@@ -58,9 +58,11 @@ sudo make uninstall
 
 # Change history
 
-## 2017/11/26 version 0.1.5
+## 2017/11/29 version 0.1.5
 
 * パーサのリファクタリング
+* prolog.ml は vm.ml と vm_builtin.ml の２つに分割しました。
+* db.ml を vm_db.ml に変更しました。
 
 ## 2017/11/25 version 0.1.4
 

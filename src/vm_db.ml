@@ -1,6 +1,6 @@
-open Syntax
+open Ast
 
-type db = (Syntax.t * int) array
+type db = (Ast.t * int) array
 
 let empty () = Array.copy [|
   Atom"freelist",0;
@@ -62,7 +62,7 @@ let remove db n =
   db.(0) <- (Num (float_of_int n), snd db.(0));
   db
 
-let retract db (f:Syntax.t->bool) =
+let retract db (f:Ast.t->bool) =
   let rec loop i db =
     if i = 0 then db else
     let (t,n) = db.(i) in

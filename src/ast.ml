@@ -68,10 +68,9 @@ and show1s ls =
 
 let rec opn defaultp os op =
   match os with
-  | [] -> defaultp
-  | o::os ->
-    try List.assoc op (List.assoc o !opsmap)
-    with Not_found -> opn defaultp os op
+  | []     -> defaultp
+  | o::os  -> try List.assoc op (List.assoc o !opsmap)
+              with Not_found -> opn defaultp os op
 
 let opnFx  = opn (-1) ["fx";"fy"]
 let opnXf  = opn (-1) ["xf";"yf"]
@@ -109,7 +108,7 @@ let rec show p = function
   | Atom("!")           -> "!"
   | Atom("[]")          -> "[]"
   | Atom(x)             -> show_atom x
-  | Num(n)           -> let s = string_of_float n in let l = (String.length s)-1 in
+  | Num(n)              -> let s = string_of_float n in let l = (String.length s)-1 in
                            if String.sub s l 1 = "." then String.sub s 0 l else s
   | Str(x)              -> Printf.sprintf "%S" x
   | Pred(x, [xs]) when opnFx x >= p -> Printf.sprintf "(%s %s)" x (show (opnFx x) xs)

@@ -1,5 +1,5 @@
-open Syntax
-open Prolog
+open Vm
+open Vm_builtin
 open Version
 
 let welcome = "GDIS Prolog version " ^ version
@@ -11,11 +11,11 @@ let help () =
   List.iter(fun (k,v) -> Printf.printf "%s\t%s\n%!" k v)
   ["e","exit"; "l","list"; "h","help";]
 
-let rec repl (d:(Syntax.t * int) array) =
+let rec repl (d:(Ast.t * int) array) =
     Printf.printf("?- %!");
     match read_line () with
     | "e"  -> ()
-    | "l"  -> Array.iter (fun (t,_) -> Printf.printf "%s.\n%!" (Syntax.show t)) d; repl d
+    | "l"  -> Array.iter (fun (t,_) -> Printf.printf "%s.\n%!" (Ast.show t)) d; repl d
     | "h"  -> help (); repl d
     | "t"  -> trace := not !trace;
               Printf.printf "Tracing %s.\n%!" (if !trace then "on" else "off");
@@ -35,7 +35,7 @@ let () =
     ])
     (fun x -> files := !files @ [x])
     usage;
-  let db = ref (consult (Db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
+  let db = ref (consult (Vm_db.empty ()) (Pred("library",[Atom "initial"]))) in (* load files *)
   !files|> List.iter(fun x ->
     db := consult !db (Atom x)
   );
