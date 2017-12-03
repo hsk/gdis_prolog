@@ -54,14 +54,10 @@ let opadd s p a ls =
   | Num p, Atom a, ls -> Ast.opadd(int_of_float p, a, ls)
   | _ -> ()
 
-let assertz process d = function
-  | Pred(":-", [t]) -> process d t
-  | t               -> Vm_db.assertz d (to_db t)
-let asserta process d = function
-  | Pred(":-", [t]) -> process d t
-  | t               -> Vm_db.asserta d (to_db t)
+let assertz d t = Vm_db.assertz d (to_db t)
+let asserta d t = Vm_db.asserta d (to_db t)
 
-let consult1 process solve d t =
+let consult d t =
   let filename = match t with
   | Atom a -> a
   | Pred("library",[Atom t]) -> !libpath ^ "/" ^ t ^ ".pl"
@@ -70,10 +66,17 @@ let consult1 process solve d t =
   if !trace then Printf.printf "Loading %s\n" filename;
   let inp = open_in filename in
   let lexer = Lexing.from_channel inp in
-  let rec loop d =
+  let rec loop () =
     match Parser.sentence Lexer.token lexer with
-    | Atom "" -> d
-    | p -> 
+    | Atom "" -> Atom "[]"
+    | p -> Pred("[|]",[p;loop ()])
+  in
+  let ps = loop () in
+  close_in inp;
+  let rec loop d = function
+    | Atom "[]" -> d
+    | Pred("[|]",[p;ps]) ->
+      let p = Parser.opconvert p in
       let v = Var("_",-1) in
       let (p,d) = match solve([Pred("term_expansion",[p;v])], d, -1, []) with
         | Succ(g,d,i,s) -> (deref (e s) v,d)
@@ -93,14 +96,16 @@ let consult1 process solve d t =
             Pred(n, [a;b]),d
           | t            -> t,d
       in
-      let p,d = match p with
-      | Pred (":-",[h;goal]) -> let g,d= goal_expansion goal d in Pred(":-",[h;g]),d
-      | Pred (":-",[goal]) -> let g,d= goal_expansion goal d in Pred(":-",[g]),d
-      | p -> p,d
+      let d = match p with
+      | Pred (":-",[h;goal]) -> let g,d= goal_expansion goal d in assertz d (Pred(":-",[h;g]))
+      | Pred (":-",[goal]) -> let g,d= goal_expansion goal d in process d g
+      | p -> assertz d p
       in
-      loop (assertz process d p)
-  in loop d
-let consult = consult1 process solve
+      loop d ps
+      (*
+      loop (process d (Pred(";",[Pred("macro_run",[p]);Pred("assertz",[p])]))) ps
+      *)
+  in loop d ps
 
 let not1 g d s = function
   | Fail d -> Succ(g,d,-1,s)
@@ -127,24 +132,24 @@ let () =
   let hook = !runtime in
   runtime := fun ((g,d,i,s) as m) -> match (g,d,s) with
     | Atom "halt"         ::g, d, s -> exit 0
-    | Atom "true"         ::g, d, s -> step (Succ(g,d,-1,s))
-    | Atom "!"            ::g, d, (g2,e,l,_)::s -> step (Succ(g, d, -1, (g2, e,l, -2)::s))
-    | Pred(",",  [u;v])   ::g, d, s -> step (Succ(u::v::g, d, -1, s))
-    | Pred(";",  [u;v])   ::g, d, s -> let e,l1=el1 s in step (Succ(   u::g, d, -1, (v::g, e,l1, -1)::s))
-    | Pred("=",  [u;v])   ::g, d, s -> step (uni m s u v)
-    | Pred("\\=",[u;v])   ::g, d, s -> step (uninot m s u v)
-    | Pred("\\", [u])     ::g, d, s -> step (not1 g d s (step(Succ([u], d, -1, []))))
-    | Pred("is", [u;v])   ::g, d, s -> step (uni m s u (Num(eval (e s) (deref (e s) v))))
-    | Pred("assertz", [t])::g, d, s -> step (Succ(g, assertz process d (deref (e s) t), -1, s))
-    | Pred("asserta", [t])::g, d, s -> step (Succ(g, asserta process d (deref (e s) t), -1, s))
-    | Pred("write",   [t])::g, d, s -> write1 (e s) t; step (Succ(g,d,-1,s))
-    | Pred("retract", [t])::g, d, s -> step (Succ(g,retract1 d t (e s),-1,s))
-    | Pred("retractall", [t])::g, d, s -> step (Succ(g,retractall d t (e s),-1,s))
-    | Pred("consult", [t])::g, d, s -> step (Succ(g, consult1 process solve d (deref (e s) t), -1, s))
-    | Pred("integer", [t])::g, d, s -> step (match deref (e s) t with Num _->Succ(g, d,-1,s)|_->pop m)
-    | Pred("atom",    [t])::g, d, s -> step (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
-    | Pred("var",     [t])::g, d, s -> step (match deref (e s) t with Var _->Succ(g, d,-1,s)|_->pop m)
-    | Pred("call",      t)::g, d, s -> step (call t g d (-1) s)
-    | Pred("op",[p;m;ls]) ::g, d, s -> opadd s p m ls; step (Succ(g,d,-1,s))
-    | Pred("=..",[a;b])   ::g, d, s -> step (univ m s a b)
+    | Atom "true"         ::g, d, s -> Succ(g,d,-1,s)
+    | Atom "!"            ::g, d, (g2,e,l,_)::s -> Succ(g, d, -1, (g2, e,l, -2)::s)
+    | Pred(",",  [u;v])   ::g, d, s -> Succ(u::v::g, d, -1, s)
+    | Pred(";",  [u;v])   ::g, d, s -> let e,l1=el1 s in Succ(   u::g, d, -1, (v::g, e,l1, -1)::s)
+    | Pred("=",  [u;v])   ::g, d, s -> uni m s u v
+    | Pred("\\=",[u;v])   ::g, d, s -> uninot m s u v
+    | Pred("\\", [u])     ::g, d, s -> not1 g d s (step(Succ([u], d, -1, [])))
+    | Pred("is", [u;v])   ::g, d, s -> uni m s u (Num(eval (e s) (deref (e s) v)))
+    | Pred("assertz", [t])::g, d, s -> Succ(g, assertz d (deref (e s) t), -1, s)
+    | Pred("asserta", [t])::g, d, s -> Succ(g, asserta d (deref (e s) t), -1, s)
+    | Pred("write",   [t])::g, d, s -> write1 (e s) t; Succ(g,d,-1,s)
+    | Pred("retract", [t])::g, d, s -> Succ(g,retract1 d t (e s),-1,s)
+    | Pred("retractall", [t])::g, d, s -> Succ(g,retractall d t (e s),-1,s)
+    | Pred("consult", [t])::g, d, s -> Succ(g, consult d (deref (e s) t), -1, s)
+    | Pred("integer", [t])::g, d, s -> (match deref (e s) t with Num _->Succ(g, d,-1,s)|_->pop m)
+    | Pred("atom",    [t])::g, d, s -> (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
+    | Pred("var",     [t])::g, d, s -> (match deref (e s) t with Var _->Succ(g, d,-1,s)|_->pop m)
+    | Pred("call",      t)::g, d, s -> call t g d (-1) s
+    | Pred("op",[p;m;ls]) ::g, d, s -> opadd s p m ls; Succ(g,d,-1,s)
+    | Pred("=..",[a;b])   ::g, d, s -> univ m s a b
     |                       g, d, s -> hook m

@@ -64,14 +64,14 @@ let runtime = ref (fun (g,d,i,s)->Fail d)
 let rec step = function
   | Fail d     -> Fail d
   | Succ (g,d,i,s as m) ->
-    if !trace then Printf.printf "i=%d g=[%s],e=[%s],s=%d\n"
-      i (String.concat "; " (List.map Ast.show g)) (show (e s)) (List.length s);
+    if !trace then Printf.printf "i=%d g=[%s],d=%d,e=[%s],s=%d\n"
+      i (String.concat "; " (List.map Ast.show g)) (Array.length d) (show (e s)) (List.length s);
     match m with
     |   [], d,  i, s -> Succ m
-    |    g, d, -2, s -> step (match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s)| m -> step m) 
+    |    g, d, -2, s -> (match pop m with Succ(g,d,i,s) when i > 0 -> step(Succ(g,d,-2,s))| m -> m)
     |    g, d, -1, s -> !runtime m
     | t::g, d,  i, s ->
-      if i==0 then step (pop m) else
+      if i=0 || Array.length d = 4 then (pop m) else
       if Array.length d <= i then Fail d else
       match d.(i) with
       | (Pred(":-", [t2; t3]),nx) ->
@@ -82,15 +82,20 @@ let rec step = function
           | t -> t
         in
         begin match unify e t (gen_t t2) with
-        | None   -> step (Succ(       t::g, d, nx, s))
-        | Some e -> step (Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s))
+        | None   -> Succ(       t::g, d, nx, s)
+        | Some e -> Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s)
         end
-      | (_,nx) -> step(Succ(t::g,d,nx,s))
+      | (_,nx) -> Succ(t::g,d,nx,s)
 and solve m =
-  step (match m with
-  | [], _, _, _ -> pop m
-  | _           -> Succ m
-  )
+  let m = match m with
+    | [], _, _, _ -> pop m
+    | _           -> Succ m
+  in
+  match step m with
+  | (Succ ([],_,_,_) as m) -> m
+  | Succ m -> solve m
+  | m -> m
+              
 and process d t =
   let rec prove f m = match solve m with
     | Fail d -> Printf.printf "false\n"; d

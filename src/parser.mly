@@ -43,7 +43,7 @@ and opconvert_post p t = function
 %%
 query:    | expr3 DOT                { opconvert $1 }
 sentence: | EOF                      { Atom "" }
-          | expr3 DOT                { opconvert $1 }
+          | expr3 DOT                { $1 }
 expr3:    | term3                    { $1 }
 expr2:    | /* empty */              { [] }
           | term2                    { [$1] }
