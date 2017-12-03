@@ -6,6 +6,7 @@ let empty () = Array.copy [|
   Atom"freelist",0;
   Atom"start",3;
   Atom"end",2;
+  (*Pred(":-",[Atom "fail";Atom "false"]),0;*)
 |]
 
 let dump db =
