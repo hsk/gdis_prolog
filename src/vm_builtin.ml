@@ -82,23 +82,15 @@ let consult d t =
         | Succ(g,d,i,s) -> (deref (e s) v,d)
         | Fail d -> (p,d)
       in
-      (* goal_expansion *)
-      let rec goal_expansion p d =
-        match solve([Pred("goal_expansion",[p;v])], d, -1, []) with
-        | Succ(g,d,i,s) -> goal_expansion (deref (e s) v) d
-        | Fail d ->
-          match p with
-          | Pred ("," as n, [a;b]) 
-          | Pred (";" as n, [a;b])
-          | Pred ("->" as n, [a;b]) ->
-            let a,d = goal_expansion a d in
-            let b,d = goal_expansion b d in
-            Pred(n, [a;b]),d
-          | t            -> t,d
+      (* expand_term *)
+      let rec expand_term p d = 
+        match solve([Pred("expand_term",[p;v])], d, -1, []) with
+        | Succ(g,d,i,s) -> (deref (e s) v),d
+        | Fail d -> p,d
       in
       let d = match p with
-      | Pred (":-",[h;goal]) -> let g,d= goal_expansion goal d in assertz d (Pred(":-",[h;g]))
-      | Pred (":-",[goal]) -> let g,d= goal_expansion goal d in process d g
+      | Pred (":-",[h;goal]) -> let g,d= expand_term goal d in assertz d (Pred(":-",[h;g]))
+      | Pred (":-",[goal]) -> let g,d= expand_term goal d in process d g
       | p -> assertz d p
       in
       loop d ps

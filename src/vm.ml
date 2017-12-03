@@ -51,8 +51,8 @@ let el1 s = match s with
   | (_, e, l, _)::_ -> e,l+1
 
 let pop m = match m with
-  |   _,  d, _, ( g, _,_, i)::s -> Succ (g, d, i, s)
-  |   _,  d, _,              [] -> Fail d
+|   _,  d, _,              [] -> Fail d
+|   _,  d, _, ( g, _,_, i)::s -> Succ (g, d, i, s)
 
 let uni m s t t2 =
   match unify (e s) t t2, m with
@@ -95,7 +95,12 @@ and solve m =
   | (Succ ([],_,_,_) as m) -> m
   | Succ m -> solve m
   | m -> m
-              
+and solve1 d t = solve ([t],d,-1,[[],[],1,-2])
+and process1 d t =
+  match solve1 d t with
+  | Fail d -> Printf.printf "false\n"; d
+  | Succ (_,d,_,_) -> d
+
 and process d t =
   let rec prove f m = match solve m with
     | Fail d -> Printf.printf "false\n"; d
