@@ -42,6 +42,6 @@ expand_term(T,T_) :- goal_expansion(T,T1),!,expand_term(T1,T_),!
   ; T_=T,!.
 macro_run(T) :-
   (term_expansion(T,T1);T=T1),
-  (T1=(:- T3),expand_term(T3,T3_),call(T3_)
-  ;T1=(A1:-A2),expand_term(A1,A1_),expand_term(A2,A2_),assertz(A1:-A2)
-  ;expand_term(T1,T_),assertz(T_)).
+  (T1=(:- T3),!,expand_term(T3,T3_),!,call(T3_)
+  ;T1=(A1:-A2),expand_term(A2,A2_),assertz(A1:-A2)
+  ;assertz(T1)).

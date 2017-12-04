@@ -1,1 +1,1 @@
-:- A=1,\ (A = 2), writeln(A),halt.
+:- A=1,\+ (A = 2), writeln(A),halt.

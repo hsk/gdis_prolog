@@ -69,6 +69,7 @@ let rec step = function
     match m with
     |   [], d,  i, s -> Succ m
     |    g, d, -2, s -> (match pop m with Succ(g,d,i,s) when i > 0 -> step(Succ(g,d,-2,s))| m -> m)
+    | Pred(a,[])::g,d,i,s -> step (Succ(Atom a::g,d,i,s))
     |    g, d, -1, s -> !runtime m
     | t::g, d,  i, s ->
       if i=0 || Array.length d = 4 then (pop m) else

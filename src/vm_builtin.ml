@@ -22,7 +22,7 @@ let write1 e t = Printf.printf "%s%!" (Ast.show (deref e t))
 let call t g d i s = match List.map (fun t -> deref (e s) t) t with
   | Atom a::ts -> Succ(Pred(a,ts)::g,d,i,s)
   | Pred(a,ts1)::ts -> Succ(Pred(a,ts1@ts)::g,d,i,s)
-  | _ -> Fail(d)
+  | p -> Fail(d)
 
 let to_db = function
   | Pred(":-",[_;_]) as t -> t
@@ -77,26 +77,12 @@ let consult d t =
     | Atom "[]" -> d
     | Pred("[|]",[p;ps]) ->
       let p = Parser.opconvert p in
-      let v = Var("_",-1) in
-      let (p,d) = match solve([Pred("term_expansion",[p;v])], d, -1, []) with
-        | Succ(g,d,i,s) -> (deref (e s) v,d)
-        | Fail d -> (p,d)
-      in
-      (* expand_term *)
-      let rec expand_term p d = 
-        match solve([Pred("expand_term",[p;v])], d, -1, []) with
-        | Succ(g,d,i,s) -> (deref (e s) v),d
-        | Fail d -> p,d
-      in
-      let d = match p with
-      | Pred (":-",[h;goal]) -> let g,d= expand_term goal d in assertz d (Pred(":-",[h;g]))
-      | Pred (":-",[goal]) -> let g,d= expand_term goal d in process d g
-      | p -> assertz d p
+      let d = match solve([Pred("current_predicate",[Pred("/",[Atom"macro_run";Num 1.0])])], d, -1, []) with
+        | Succ(g,d,i,s)->
+          (match solve([Pred("macro_run",[p])], d, -1, []) with Succ(g,d,i,s) -> d | Fail d -> Printf.printf "false\n"; d)
+        | Fail d -> assertz d p
       in
       loop d ps
-      (*
-      loop (process d (Pred(";",[Pred("macro_run",[p]);Pred("assertz",[p])]))) ps
-      *)
   in loop d ps
 
 let not1 g d s = function
@@ -120,28 +106,56 @@ let univ m s a b =
   | Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
   | _,_,(_,d,_,_) -> Fail d
 
+let builtin_predicates = [
+  "halt/0"         , (fun [] g d s m -> exit 0; Fail d);
+  "true/0"         , (fun [] g d s m -> Succ(g,d,-1,s));
+  "!/0"            , (fun [] g d s m -> match s with (g2,e,l,_)::s -> Succ(g, d, -1, (g2, e,l, -2)::s) | _->Fail d);
+  ",/2"            , (fun [u;v] g d s m -> Succ(u::v::g, d, -1, s));
+  ";/2"            , (fun [u;v] g d s m -> let e,l1=el1 s in Succ(   u::g, d, -1, (v::g, e,l1, -1)::s));
+  "=/2"            , (fun [u;v] g d s m -> uni m s u v);
+  "\\=/2"          , (fun [u;v] g d s m -> uninot m s u v);
+  "\\+/1"          , (fun [u] g d s m -> not1 g d s (step(Succ([u], d, -1, []))));
+  "is/2"           , (fun [u;v] g d s m -> uni m s u (Num(eval (e s) (deref (e s) v))));
+  "assertz/1"      , (fun [t] g d s m -> Succ(g, assertz d (deref (e s) t), -1, s));
+  "asserta/1"      , (fun [t] g d s m -> Succ(g, asserta d (deref (e s) t), -1, s));
+  "write/1"        , (fun [t] g d s m -> write1 (e s) t; Succ(g,d,-1,s));
+  "retract/1"      , (fun [t] g d s m -> Succ(g,retract1 d t (e s),-1,s));
+  "retractall/1"   , (fun [t] g d s m -> Succ(g,retractall d t (e s),-1,s));
+  "consult/1"      , (fun [t] g d s m -> Succ(g, consult d (deref (e s) t), -1, s));
+  "integer/1"      , (fun [t] g d s m -> (match deref (e s) t with Num _->Succ(g, d,-1,s)|_->pop m));
+  "atom/1"         , (fun [t] g d s m -> (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m));
+  "var/1"          , (fun [t] g d s m -> (match deref (e s) t with Var _->Succ(g, d,-1,s)|_->pop m));
+  "op/3"           , (fun [p;m;ls] g d s _ -> opadd s p m ls; Succ(g,d,-1,s));
+  "=../2"          , (fun [a;b] g d s m -> univ m s a b);
+  "call/1"         , (fun t g d s m -> call t g d (-1) s);
+  "call/2"         , (fun t g d s m -> call t g d (-1) s);
+  "call/3"         , (fun t g d s m -> call t g d (-1) s);
+  "call/4"         , (fun t g d s m -> call t g d (-1) s);
+  "call/5"         , (fun t g d s m -> call t g d (-1) s);
+  "call/6"         , (fun t g d s m -> call t g d (-1) s);
+  "call/7"         , (fun t g d s m -> call t g d (-1) s);
+  "call/8"         , (fun t g d s m -> call t g d (-1) s);
+  "current_predicate/1", (fun t g d s m -> assert false);
+]
+
+let arity = function
+  | Atom a -> a^"/0"
+  | Pred(a,ts)-> a^"/"^(string_of_int (List.length ts))
+  | _ -> "none"
+let params = function
+  | Atom a -> []
+  | Pred(a,ts)-> ts
+  | _ -> assert false
+
 let () =
   let hook = !runtime in
-  runtime := fun ((g,d,i,s) as m) -> match (g,d,s) with
-    | Atom "halt"         ::g, d, s -> exit 0
-    | Atom "true"         ::g, d, s -> Succ(g,d,-1,s)
-    | Atom "!"            ::g, d, (g2,e,l,_)::s -> Succ(g, d, -1, (g2, e,l, -2)::s)
-    | Pred(",",  [u;v])   ::g, d, s -> Succ(u::v::g, d, -1, s)
-    | Pred(";",  [u;v])   ::g, d, s -> let e,l1=el1 s in Succ(   u::g, d, -1, (v::g, e,l1, -1)::s)
-    | Pred("=",  [u;v])   ::g, d, s -> uni m s u v
-    | Pred("\\=",[u;v])   ::g, d, s -> uninot m s u v
-    | Pred("\\", [u])     ::g, d, s -> not1 g d s (step(Succ([u], d, -1, [])))
-    | Pred("is", [u;v])   ::g, d, s -> uni m s u (Num(eval (e s) (deref (e s) v)))
-    | Pred("assertz", [t])::g, d, s -> Succ(g, assertz d (deref (e s) t), -1, s)
-    | Pred("asserta", [t])::g, d, s -> Succ(g, asserta d (deref (e s) t), -1, s)
-    | Pred("write",   [t])::g, d, s -> write1 (e s) t; Succ(g,d,-1,s)
-    | Pred("retract", [t])::g, d, s -> Succ(g,retract1 d t (e s),-1,s)
-    | Pred("retractall", [t])::g, d, s -> Succ(g,retractall d t (e s),-1,s)
-    | Pred("consult", [t])::g, d, s -> Succ(g, consult d (deref (e s) t), -1, s)
-    | Pred("integer", [t])::g, d, s -> (match deref (e s) t with Num _->Succ(g, d,-1,s)|_->pop m)
-    | Pred("atom",    [t])::g, d, s -> (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m)
-    | Pred("var",     [t])::g, d, s -> (match deref (e s) t with Var _->Succ(g, d,-1,s)|_->pop m)
-    | Pred("call",      t)::g, d, s -> call t g d (-1) s
-    | Pred("op",[p;m;ls]) ::g, d, s -> opadd s p m ls; Succ(g,d,-1,s)
-    | Pred("=..",[a;b])   ::g, d, s -> univ m s a b
-    |                       g, d, s -> hook m
+  runtime := fun ((g,d,i,s) as m) -> match g with
+  | Pred("current_predicate",[u])::g -> let p = (Ast.show (deref (e s) u)) in
+                                        if List.mem_assoc p builtin_predicates
+                                        || Array.to_list d |>List.exists(function
+                                          | (Pred(":-",[u;v]),_)->p=arity u
+                                          |(p,_)->false )
+                                        then Succ(g,d,-1,s) else Fail d
+  | p::g when List.mem_assoc (arity p) builtin_predicates ->
+    (List.assoc (arity p) builtin_predicates) (params p) g d s m
+  | _ -> hook m

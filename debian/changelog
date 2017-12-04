@@ -1,3 +1,9 @@
+gdis-prolog (0.1.6) Unrelease zesty; urgency=medium
+
+  * 
+
+ -- sakurai <sakurai777@gmail.com>  Mon, 04 Dec 2017 09:52:07 +0900
+
 gdis-prolog (0.1.5) zesty; urgency=medium
 
   * fix parser bug about list.

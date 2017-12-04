@@ -93,7 +93,7 @@ let show_atom x =
 let showbin = function
   | "," -> ", "
   | "!" -> "!"
-  | x -> " " ^ x ^ " "
+  | x -> x
 
 let rec show p = function
   | Pred("",[t1;t2])   -> Printf.sprintf "%s %s"  (show 10000 t1) (show 10000 t2)

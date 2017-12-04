@@ -4,5 +4,4 @@ a(A,B,C) :- write(A),write(B),writeln(C).
 :- call((A=1;A=2,!)),A=2,writeln(1),!;writeln(2),!.
 :- call((A=1,!;A=2,!)),A=2,writeln(1),!;writeln(2),!.
 
-
-:- halt.
+:- call(halt).
