@@ -34,7 +34,7 @@ let rec unify e t t2 =
   in unify (Some e) (t, t2)
 
 type g = t list             (* goals *)
-type d = t array            (* database *)
+type d = (t * int)array     (* database *)
 type i = int                (* index *)
 type s = (g * e * i * i) list (* stack *)
 type m = g * d * i * s      (* gdis machine *)
@@ -59,7 +59,16 @@ let uni m s t t2 =
   | Some e, (_::g, d, _, (sg, _,l, i)::s) -> Succ (g, d, -1, (sg, e, l, i) :: s)
   |      _,                           m -> pop m
 
-let runtime = ref (fun (g,d,i,s)->Fail d)
+let arity = function
+  | Atom a -> a^"/0"
+  | Pred(a,ts)-> a^"/"^(string_of_int (List.length ts))
+  | _ -> "none"
+let params = function
+  | Atom a -> []
+  | Pred(a,ts)-> ts
+  | _ -> assert false
+
+let builtins = ref []
 
 let rec step = function
   | Fail d     -> Fail d
@@ -70,7 +79,8 @@ let rec step = function
     |   [], d,  i, s -> Succ m
     |    g, d, -2, s -> (match pop m with Succ(g,d,i,s) when i > 0 -> step(Succ(g,d,-2,s))| m -> m)
     | Pred(a,[])::g,d,i,s -> step (Succ(Atom a::g,d,i,s))
-    |    g, d, -1, s -> !runtime m
+    | p::g, d, -1, s when List.mem_assoc (arity p) !builtins -> (List.assoc (arity p) !builtins) (params p) g d s m
+    |    g, d, -1, s -> step (Succ(g, d, Vm_db.get_start d, s))
     | t::g, d,  i, s ->
       if i=0 || Array.length d = 4 then (pop m) else
       if Array.length d <= i then Fail d else
@@ -117,5 +127,3 @@ and process d t =
         d
       )
   in prove true ([t], d, -1, [[],[],1,-2])
-
-let () = runtime := (fun (g,d,i,s)->step (Succ(g, d, Vm_db.get_start d, s)))

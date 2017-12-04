@@ -106,7 +106,8 @@ let univ m s a b =
   | Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
   | _,_,(_,d,_,_) -> Fail d
 
-let builtin_predicates = [
+let () =
+  builtins := [
   "halt/0"         , (fun [] g d s m -> exit 0; Fail d);
   "true/0"         , (fun [] g d s m -> Succ(g,d,-1,s));
   "!/0"            , (fun [] g d s m -> match s with (g2,e,l,_)::s -> Succ(g, d, -1, (g2, e,l, -2)::s) | _->Fail d);
@@ -135,27 +136,12 @@ let builtin_predicates = [
   "call/6"         , (fun t g d s m -> call t g d (-1) s);
   "call/7"         , (fun t g d s m -> call t g d (-1) s);
   "call/8"         , (fun t g d s m -> call t g d (-1) s);
-  "current_predicate/1", (fun t g d s m -> assert false);
+  "current_predicate/1", (fun [u] g d s m ->
+                          let p = (Ast.show (deref (e s) u)) in
+                          if List.mem_assoc p !builtins
+                          || Array.to_list d |>List.exists(function
+                            | (Pred(":-",[u;v]),_)->p=arity u
+                            |(p,_)->false )
+                          then Succ(g,d,-1,s) else Fail d
+                          );
 ]
-
-let arity = function
-  | Atom a -> a^"/0"
-  | Pred(a,ts)-> a^"/"^(string_of_int (List.length ts))
-  | _ -> "none"
-let params = function
-  | Atom a -> []
-  | Pred(a,ts)-> ts
-  | _ -> assert false
-
-let () =
-  let hook = !runtime in
-  runtime := fun ((g,d,i,s) as m) -> match g with
-  | Pred("current_predicate",[u])::g -> let p = (Ast.show (deref (e s) u)) in
-                                        if List.mem_assoc p builtin_predicates
-                                        || Array.to_list d |>List.exists(function
-                                          | (Pred(":-",[u;v]),_)->p=arity u
-                                          |(p,_)->false )
-                                        then Succ(g,d,-1,s) else Fail d
-  | p::g when List.mem_assoc (arity p) builtin_predicates ->
-    (List.assoc (arity p) builtin_predicates) (params p) g d s m
-  | _ -> hook m
