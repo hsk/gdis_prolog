@@ -1,8 +1,15 @@
 gdis-prolog (0.1.6) Unrelease zesty; urgency=medium
 
-  * 
+  * Countermeasures against bugs in which the call call of Arity / 0 fails.
+  * Advance Prologization of call of couslut / 2.
+  * Corrected `\ / 1` to` \ + / 1`.
+  * added current_predicate / 1.
+  * cousult / 2 changed to call `macro_run / 1` if` macro_run / 1` is present using current_predicate / 1.
+  * Rewrite to extend using built-in predicate table reference.
+  * Added opconvert / 2.
+  * Separate the built-in predicate of consult / 2 into read / 2 and predicate consult / 2.
 
- -- sakurai <sakurai777@gmail.com>  Mon, 04 Dec 2017 09:52:07 +0900
+ -- sakurai <sakurai777@gmail.com>  Mon, 04 Dec 2017 20:10:07 +0900
 
 gdis-prolog (0.1.5) zesty; urgency=medium
 

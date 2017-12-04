@@ -56,6 +56,13 @@ let opadd s p a ls =
 
 let assertz d t = Vm_db.assertz d (to_db t)
 let asserta d t = Vm_db.asserta d (to_db t)
+let current_predicate = fun [u] g d s m ->
+  let p = (Ast.show (deref (e s) u)) in
+  if List.mem_assoc p !builtins
+  || Array.to_list d |>List.exists(function
+    | (Pred(":-",[u;v]),_)->p=arity u
+    |(p,_)->false )
+  then Succ(g,d,-1,s) else Fail d
 
 let read d t =
   let filename = match t with
@@ -110,14 +117,6 @@ let univ m s a b =
   | Pred(a,ts), t, m -> uni m s t (Pred("[|]",[Atom a;list2pred ts]))
   | Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
   | _,_,(_,d,_,_) -> Fail d
-
-let current_predicate = fun [u] g d s m ->
-  let p = (Ast.show (deref (e s) u)) in
-  if List.mem_assoc p !builtins
-  || Array.to_list d |>List.exists(function
-    | (Pred(":-",[u;v]),_)->p=arity u
-    |(p,_)->false )
-  then Succ(g,d,-1,s) else Fail d
 
 let () =
   builtins := [
