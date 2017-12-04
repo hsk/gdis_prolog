@@ -1,8 +1,14 @@
 gdis-prolog (0.1.5) zesty; urgency=medium
 
-  * fix parser bug about list 
+  * fix parser bug about list.
+  * refactoring step function for debugging feauture.
+  * prolog.ml was divided into two, vm.ml and vm_builtin.ml.
+  * Changed db.ml to vm_db.ml.
+  * To prepare for the debugger implementation, the step is executed only one step.
+  * consult/2 has been rewritten to become step executable.
+  * goal_expansion is called by the prolog expand_term predicate.
 
- -- sakurai <sakurai777@gmail.com>  Sun, 26 Nov 2017 04:13:56 +0900
+ -- sakurai <sakurai777@gmail.com>  Mon, 04 Dec 2017 09:17:59 +0900
 
 gdis-prolog (0.1.4) zesty; urgency=medium
 
