@@ -61,16 +61,17 @@ sudo make uninstall
 ## 2017/12/04 version 0.1.6
 
 * アリティ/0のcall呼び出しが失敗するバグの対策。
-* couslut/2の呼び出しのProlog化を一歩進めた。
+* couslut/2の呼び出しのProlog化を進めた。
 * `\/1` を `\+/1` に修正。
 * current_predicate/1 を追加。
-* cousult/2 は current_predicate/1 を使って`macro_run/1` があったら`macro_run/1` を呼ぶように変えた。
+* cousult/2 は current_predicate/1 を使って`macro_run/1` があったら`macro_run/1` を呼ぶように変更。
+* 組み込み述語のテーブルのリファレンスを使って拡張するように書き換え。
+* opconvert/2 を追加。
+* consult/2の組み込み述語をread/2 と述語 consult/2 に分離する。
 
-todo
+todo 以下の挙動がおかしい
 
-* 組み込み述語のテーブルのリファレンスを使って拡張するように書き換える。
-* current_predicate/1も組み込み述語テーブルの拡張で表す。
-
+* :- A =.. B, writeln(B).
 
 ## 2017/12/04 version 0.1.5
 

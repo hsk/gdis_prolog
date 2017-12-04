@@ -44,4 +44,9 @@ macro_run(T) :-
   (term_expansion(T,T1);T=T1),
   (T1=(:- T3),!,expand_term(T3,T3_),!,call(T3_)
   ;T1=(A1:-A2),expand_term(A2,A2_),assertz(A1:-A2)
-  ;assertz(T1)).
+  ;assertz(T1)
+  ;writeln(error:T1)).
+
+consult_loop([]).
+consult_loop([P|PS]) :- opconvert(P,P_), (macro_run(P_);writeln(false)),!,consult_loop(PS).
+consult(A) :- read(A,B),!,consult_loop(B).

@@ -57,7 +57,7 @@ let opadd s p a ls =
 let assertz d t = Vm_db.assertz d (to_db t)
 let asserta d t = Vm_db.asserta d (to_db t)
 
-let consult d t =
+let read d t =
   let filename = match t with
   | Atom a -> a
   | Pred("library",[Atom t]) -> !libpath ^ "/" ^ t ^ ".pl"
@@ -69,21 +69,26 @@ let consult d t =
   let rec loop () =
     match Parser.sentence Lexer.token lexer with
     | Atom "" -> Atom "[]"
-    | p -> Pred("[|]",[p;loop ()])
+    | p -> Pred("[|]",[Vm_db.copy_term p;loop ()])
   in
   let ps = loop () in
   close_in inp;
-  let rec loop d = function
-    | Atom "[]" -> d
-    | Pred("[|]",[p;ps]) ->
-      let p = Parser.opconvert p in
-      let d = match solve([Pred("current_predicate",[Pred("/",[Atom"macro_run";Num 1.0])])], d, -1, []) with
-        | Succ(g,d,i,s)->
-          (match solve([Pred("macro_run",[p])], d, -1, []) with Succ(g,d,i,s) -> d | Fail d -> Printf.printf "false\n"; d)
-        | Fail d -> assertz d p
-      in
-      loop d ps
-  in loop d ps
+  ps
+let read2 m g d s t u =
+  let ps = read d (deref (e s)t) in
+  uni m s u ps
+
+let consult d t =
+  match solve1 d (Pred("current_predicate",[Pred("/",[Atom"consult";Num 1.0])])) with
+  | Fail d -> let rec loop d = function
+                | Atom "[]" -> d
+                | Pred("[|]",[p;ps]) -> loop (assertz d (Parser.opconvert p)) ps
+              in
+              loop d (read d t)
+  | Succ(g,d,i,s)->
+    match solve ([Pred("consult",[t])],d,-1,[]) with
+    | Succ(g,d,i,s) -> d
+    | Fail d -> Printf.printf "false\n"; d
 
 let not1 g d s = function
   | Fail d -> Succ(g,d,-1,s)
@@ -106,6 +111,14 @@ let univ m s a b =
   | Atom "[]", t, m -> uni m s t (Pred("[|]",[Atom "[]";Atom"[]"]))
   | _,_,(_,d,_,_) -> Fail d
 
+let current_predicate = fun [u] g d s m ->
+  let p = (Ast.show (deref (e s) u)) in
+  if List.mem_assoc p !builtins
+  || Array.to_list d |>List.exists(function
+    | (Pred(":-",[u;v]),_)->p=arity u
+    |(p,_)->false )
+  then Succ(g,d,-1,s) else Fail d
+
 let () =
   builtins := [
   "halt/0"         , (fun [] g d s m -> exit 0; Fail d);
@@ -122,7 +135,8 @@ let () =
   "write/1"        , (fun [t] g d s m -> write1 (e s) t; Succ(g,d,-1,s));
   "retract/1"      , (fun [t] g d s m -> Succ(g,retract1 d t (e s),-1,s));
   "retractall/1"   , (fun [t] g d s m -> Succ(g,retractall d t (e s),-1,s));
-  "consult/1"      , (fun [t] g d s m -> Succ(g, consult d (deref (e s) t), -1, s));
+  "read/2"         , (fun [t;u] g d s m -> read2 m g d s t u);
+  "read/1"         , (fun [t] g d s m -> Succ(g, consult d (deref (e s) t), -1, s));
   "integer/1"      , (fun [t] g d s m -> (match deref (e s) t with Num _->Succ(g, d,-1,s)|_->pop m));
   "atom/1"         , (fun [t] g d s m -> (match deref (e s) t with Atom _->Succ(g, d,-1,s)|_->pop m));
   "var/1"          , (fun [t] g d s m -> (match deref (e s) t with Var _->Succ(g, d,-1,s)|_->pop m));
@@ -136,12 +150,6 @@ let () =
   "call/6"         , (fun t g d s m -> call t g d (-1) s);
   "call/7"         , (fun t g d s m -> call t g d (-1) s);
   "call/8"         , (fun t g d s m -> call t g d (-1) s);
-  "current_predicate/1", (fun [u] g d s m ->
-                          let p = (Ast.show (deref (e s) u)) in
-                          if List.mem_assoc p !builtins
-                          || Array.to_list d |>List.exists(function
-                            | (Pred(":-",[u;v]),_)->p=arity u
-                            |(p,_)->false )
-                          then Succ(g,d,-1,s) else Fail d
-                          );
+  "current_predicate/1", current_predicate;
+  "opconvert/2"    , (fun [u;v] g d s m -> let u = Parser.opconvert (deref (e s) u) in uni m s (deref (e s) u) (deref (e s) v) )
 ]
