@@ -1,6 +1,7 @@
-writeln2(A) :- write(A),nl,!.
+% 述語が終わっても何故かカットの影響が残っている。
+writeln2(A) :- writeln(A),!.
 name(test).
 name(hoge).
-name(fuga).
-:- forall(name(A),writeln2(A)).
+:- name(A),writeln2(A),fail;true.
+:- name(A),writeln(A),fail;true.
 :- halt.

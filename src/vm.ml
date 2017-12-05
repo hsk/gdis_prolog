@@ -53,7 +53,14 @@ let el1 s = match s with
 let pop m = match m with
 |   _,  d, _,              [] -> Fail d
 |   _,  d, _, ( g, _,_, i)::s -> Succ (g, d, i, s)
+let rec pop1 l1 d s = match s with
+| []->Fail d
+| (g,e,l,i)::s when l1=l -> pop1 l1 d s
+| (g,e,l,i)::s -> Succ(g,d,0, s)
 
+let backtrack d s = match s with
+| []->Fail d
+| (_,e,l,i)::s -> pop1 l d s
 let uni m s t t2 =
   match unify (e s) t t2, m with
   | Some e, (_::g, d, _, (sg, _,l, i)::s) -> Succ (g, d, -1, (sg, e, l, i) :: s)
@@ -77,27 +84,28 @@ let step = function
       i (String.concat "; " (List.map Ast.show g)) (Array.length d) (show (e s)) (List.length s);
     match m with
     |            [],d, i,s -> Succ m
-    |             g,d,-2,s -> (match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s) | m -> m)
+    |             g,d,-2,s -> backtrack d s
     | Pred(a,[])::g,d, i,s -> Succ(Atom a::g,d,i,s)
     |          t::g,d,-1,s when List.mem_assoc (arity t) !builtins -> (List.assoc (arity t) !builtins) (params t) g d s m
     |             g,d,-1,s -> Succ(g, d, Vm_db.get_start d, s)
     |          t::g,d, i,s ->
-      if i=0 || Array.length d = 4 then pop m else (* todo この Array.length d = 4 は消したい *)
-      if Array.length d <= i then Fail d else
-      match d.(i) with
-      | (Pred(":-", [t2; t3]),nx) ->
-        let e,l1 = el1 s in
-        let rec gen_t = function
-          | Pred(n, ts) -> Pred(n, List.map (fun a -> gen_t a) ts)
-          | Var(n, _)   -> Var(n, l1)
-          | t -> t
-        in
-        begin match unify e t (gen_t t2) with
-        | None   -> Succ(       t::g, d, nx, s)
-        | Some e -> Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s)
-        end
-      | (_,nx) -> Succ(t::g,d,nx,s)
-
+      let rec loop i =
+        if i=0 || Array.length d = 4 then pop m else (* todo この Array.length d = 4 は消したい *)
+        if Array.length d <= i then Fail d else
+        match d.(i) with
+        | (Pred(":-", [t2; t3]),nx) ->
+          let e,l1 = el1 s in
+          let rec gen_t = function
+            | Pred(n, ts) -> Pred(n, List.map (fun a -> gen_t a) ts)
+            | Var(n, _)   -> Var(n, l1)
+            | t -> t
+          in
+          begin match unify e t (gen_t t2) with
+          | None   -> loop nx
+          | Some e -> Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s)
+          end
+        | (_,nx) -> loop nx
+      in loop i
 (* マシンを受取り、ステップ実行を停止状態まで動かし、マシンを返す *)
 let rec solve m =
   let m = match m with

@@ -20,8 +20,8 @@ let rec eval e = function
 let write1 e t = Printf.printf "%s%!" (Ast.show (deref e t))
 
 let call t g d i s = match List.map (fun t -> deref (e s) t) t with
-  | Atom a::ts -> Succ(Pred(a,ts)::g,d,i,s)
-  | Pred(a,ts1)::ts -> Succ(Pred(a,ts1@ts)::g,d,i,s)
+  | Atom a::ts -> let e,l1=el1 s in Succ(Pred(a,ts)::g,d,i,(g,e,l1,0)::s)
+  | Pred(a,ts1)::ts -> let e,l1=el1 s in Succ(Pred(a,ts1@ts)::g,d,i,(g,e,l1,0)::s)
   | p -> Fail(d)
 
 let to_db = function
@@ -124,7 +124,7 @@ let () =
   "true/0"         , (fun [] g d s m -> Succ(g,d,-1,s));
   "!/0"            , (fun [] g d s m -> match s with (g2,e,l,_)::s -> Succ(g, d, -1, (g2, e,l, -2)::s) | _->Fail d);
   ",/2"            , (fun [u;v] g d s m -> Succ(u::v::g, d, -1, s));
-  ";/2"            , (fun [u;v] g d s m -> let e,l1=el1 s in Succ(   u::g, d, -1, (v::g, e,l1, -1)::s));
+  ";/2"            , (fun [u;v] g d s m -> let e,l1=el1 s in Succ(u::g, d, -1, (v::g, e,l1, -1)::s));
   "=/2"            , (fun [u;v] g d s m -> uni m s u v);
   "\\=/2"          , (fun [u;v] g d s m -> uninot m s u v);
   "\\+/1"          , (fun [u] g d s m -> not1 g d s (step(Succ([u], d, -1, []))));
