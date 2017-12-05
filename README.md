@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.7
+# GDIS Prolog verion 0.1.6
 
 [![](https://travis-ci.org/hsk/gdis_prolog.svg?style=flat-square)](https://travis-ci.org/hsk/gdis_prolog)
 
@@ -58,10 +58,6 @@ sudo make uninstall
 
 # Change history
 
-## 2017/12/05 version 0.1.7
-
-* 挙動がおかしい部分の修正
-
 ## 2017/12/04 version 0.1.6
 
 * アリティ/0のcall呼び出しが失敗するバグの対策。
@@ -72,6 +68,7 @@ sudo make uninstall
 * 組み込み述語のテーブルのリファレンスを使って拡張するように書き換え。
 * opconvert/2 を追加。
 * consult/2の組み込み述語をread/2 と述語 consult/2 に分離する。
+* repeatのバグ修正
 
 todo 以下の挙動がおかしい
 

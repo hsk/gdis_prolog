@@ -1,4 +1,4 @@
-gdis-prolog (0.1.6) Unrelease zesty; urgency=medium
+gdis-prolog (0.1.6) zesty; urgency=medium
 
   * Countermeasures against bugs in which the call call of Arity / 0 fails.
   * Advance Prologization of call of couslut / 2.
@@ -8,8 +8,9 @@ gdis-prolog (0.1.6) Unrelease zesty; urgency=medium
   * Rewrite to extend using built-in predicate table reference.
   * Added opconvert / 2.
   * Separate the built-in predicate of consult / 2 into read / 2 and predicate consult / 2.
+  * fix repeat bug.
 
- -- sakurai <sakurai777@gmail.com>  Mon, 04 Dec 2017 20:10:07 +0900
+ -- sakurai <sakurai777@gmail.com>  Mon, 05 Dec 2017 18:10:07 +0900
 
 gdis-prolog (0.1.5) zesty; urgency=medium
 

@@ -1,4 +1,4 @@
-VERSION = 0.1.7
+VERSION = 0.1.6
 all:
 	echo "let version =\"${VERSION}\"" > src/version.ml
 	cd src; make
