@@ -58,7 +58,7 @@ sudo make uninstall
 
 # Change history
 
-## 2017/12/04 version 0.1.6
+## 2017/12/05 version 0.1.6
 
 * アリティ/0のcall呼び出しが失敗するバグの対策。
 * couslut/2の呼び出しのProlog化を進めた。
