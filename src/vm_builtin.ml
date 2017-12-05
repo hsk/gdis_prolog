@@ -93,7 +93,7 @@ let consult d t =
               in
               loop d (read d t)
   | Succ(g,d,i,s)->
-    match solve ([Pred("consult",[t])],d,-1,[]) with
+    match solve1 d (Pred("consult",[t])) with
     | Succ(g,d,i,s) -> d
     | Fail d -> Printf.printf "false\n"; d
 
@@ -149,6 +149,6 @@ let () =
   "call/6"         , (fun t g d s m -> call t g d (-1) s);
   "call/7"         , (fun t g d s m -> call t g d (-1) s);
   "call/8"         , (fun t g d s m -> call t g d (-1) s);
+  "opconvert/2"    , (fun [u;v] g d s m -> let u = Parser.opconvert (deref (e s) u) in uni m s (deref (e s) u) (deref (e s) v) );
   "current_predicate/1", current_predicate;
-  "opconvert/2"    , (fun [u;v] g d s m -> let u = Parser.opconvert (deref (e s) u) in uni m s (deref (e s) u) (deref (e s) v) )
-]
+  ]

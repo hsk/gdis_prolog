@@ -8,9 +8,9 @@ let rec deref e t = match t with
   | t            -> t
 
 let show e =
-  String.concat "\n" (List.fold_right (fun ((n, l), t) ls ->
-    if l >= 1 then ls else (n ^ "=" ^ Ast.show (deref e t)) :: ls
-  ) e [] )
+  (List.fold_right (fun ((n, l), t) ls ->
+    if l >= 1 then ls else (n ^ "=" ^ Ast.show (deref e t)^"\n") ^ ls
+  ) e "" )
 
 type r = e option   (* result *)
 
@@ -70,19 +70,19 @@ let params = function
 
 let builtins = ref []
 
-let rec step = function
+let step = function
   | Fail d     -> Fail d
   | Succ (g,d,i,s as m) ->
-    if !trace then Printf.printf "i=%d g=[%s],d=%d,e=[%s],s=%d\n"
+    if !trace then Printf.printf "i=%d g=[%s],d=%d,e=[%s],s=%d\n%!"
       i (String.concat "; " (List.map Ast.show g)) (Array.length d) (show (e s)) (List.length s);
     match m with
-    |   [], d,  i, s -> Succ m
-    |    g, d, -2, s -> (match pop m with Succ(g,d,i,s) when i > 0 -> step(Succ(g,d,-2,s))| m -> m)
-    | Pred(a,[])::g,d,i,s -> step (Succ(Atom a::g,d,i,s))
-    | p::g, d, -1, s when List.mem_assoc (arity p) !builtins -> (List.assoc (arity p) !builtins) (params p) g d s m
-    |    g, d, -1, s -> step (Succ(g, d, Vm_db.get_start d, s))
-    | t::g, d,  i, s ->
-      if i=0 || Array.length d = 4 then (pop m) else
+    |            [],d, i,s -> Succ m
+    |             g,d,-2,s -> (match pop m with Succ(g,d,i,s) when i > 0 -> Succ(g,d,-2,s) | m -> m)
+    | Pred(a,[])::g,d, i,s -> Succ(Atom a::g,d,i,s)
+    |          t::g,d,-1,s when List.mem_assoc (arity t) !builtins -> (List.assoc (arity t) !builtins) (params t) g d s m
+    |             g,d,-1,s -> Succ(g, d, Vm_db.get_start d, s)
+    |          t::g,d, i,s ->
+      if i=0 || Array.length d = 4 then pop m else (* todo この Array.length d = 4 は消したい *)
       if Array.length d <= i then Fail d else
       match d.(i) with
       | (Pred(":-", [t2; t3]),nx) ->
@@ -97,33 +97,36 @@ let rec step = function
         | Some e -> Succ(gen_t t3::g, d,    -1, (t::g, e, l1, nx) :: s)
         end
       | (_,nx) -> Succ(t::g,d,nx,s)
-and solve m =
+
+(* マシンを受取り、ステップ実行を停止状態まで動かし、マシンを返す *)
+let rec solve m =
   let m = match m with
     | [], _, _, _ -> pop m
     | _           -> Succ m
   in
   match step m with
-  | (Succ ([],_,_,_) as m) -> m
+  | (Succ ([],d,i,s) as m) ->
+    if !trace then Printf.printf "i=%d g=[],d=%d,e=[%s],s=%d\n%!"
+      i (Array.length d) (show (e s)) (List.length s);
+    m
   | Succ m -> solve m
-  | m -> m
-and solve1 d t = solve ([t],d,-1,[[],[],1,-2])
-and process1 d t =
-  match solve1 d t with
-  | Fail d -> Printf.printf "false\n"; d
-  | Succ (_,d,_,_) -> d
+  | Fail d -> Fail d
 
-and process d t =
-  let rec prove f m = match solve m with
-    | Fail d -> Printf.printf "false\n"; d
-    | Succ (g, d, i, s as m) ->
-      if f || show (e s) <>"" && ";" = read_line () then (
-        if(!interactive && show(e s)<>"") then Printf.printf "%s%!" (show (e s));
-        if i = -2 then (Printf.printf "false\n"; d) else
-        if s = [] then (if !interactive then Printf.printf "\ntrue\n"; d) else (
-          prove false m
-        )
-      ) else (
-        if not f && !interactive then Printf.printf "true\n";
-        d
-      )
-  in prove true ([t], d, -1, [[],[],1,-2])
+let rec prove m = match solve m with
+  | Fail d -> Printf.printf "false\n%!"; d
+  | Succ (g, d, i, s as m) -> d
+
+let rec iprove m = match solve m with
+  | Fail d -> Printf.printf "false\n%!"; d
+  | Succ (g, d, i, s as m) ->
+    Printf.printf "%s%!" (show (e s));
+    if List.length s <= 1 then d else 
+    if ";" <> read_line () then (Printf.printf "true\n%!"; d) else
+    iprove m
+
+(* DBと項を受取って、マシンの初期設定をして実行し結果のDBを返す *)
+let process d t =
+  if !interactive then iprove ([t], d, -1, [[],[],1,-2])
+  else prove ([t], d, -1, [[],[],1,-2])
+
+let solve1 d t = solve ([t],d,-1,[[],[],1,-2])

@@ -1,4 +1,4 @@
-# GDIS Prolog verion 0.1.5
+# GDIS Prolog verion 0.1.7
 
 [![](https://travis-ci.org/hsk/gdis_prolog.svg?style=flat-square)](https://travis-ci.org/hsk/gdis_prolog)
 
@@ -57,6 +57,10 @@ sudo make uninstall
 ```
 
 # Change history
+
+## 2017/12/05 version 0.1.7
+
+* 挙動がおかしい部分の修正
 
 ## 2017/12/04 version 0.1.6
 

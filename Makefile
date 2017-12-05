@@ -1,4 +1,4 @@
-VERSION = 0.1.6
+VERSION = 0.1.7
 all:
 	echo "let version =\"${VERSION}\"" > src/version.ml
 	cd src; make
@@ -16,6 +16,8 @@ uninstall:
 	rm -rf /usr/bin/gdispl /usr/share/gdispl
 test:
 	cd test; make test
+testng:
+	cd test; make testng
 mkresults:
 	cd test; make mkresults
 push:

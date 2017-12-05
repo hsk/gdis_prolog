@@ -14,6 +14,7 @@ test:
 	../gdispl -lib ../lib append.pl > result.txt && diff result.txt results/append.txt
 	../gdispl -lib ../lib var.pl > result.txt && diff result.txt results/var.txt
 	../gdispl -lib ../lib current_predicate.pl > result.txt && diff result.txt results/current_predicate.txt
+	../gdispl -lib ../lib repeat.pl > result.txt && diff result.txt results/repeat.txt
 	../gdispl -lib ../lib ../examples/cut.pl > result.txt && diff result.txt results/cut.txt
 	../gdispl -lib ../lib ../examples/eval2.pl > result.txt && diff result.txt results/eval2.txt
 	../gdispl -lib ../lib ../examples/eval3.pl > result.txt && diff result.txt results/eval3.txt
@@ -33,6 +34,9 @@ test:
 	../gdispl -lib ../lib ../examples/macro.pl > result.txt && diff result.txt results/macro.txt
 	rm -rf result.txt
 	@echo "test ok"
+testng:
+	../gdispl -lib ../lib writeln2.pl > result.txt && ! diff result.txt results/writeln2.txt
+
 mkresults:
 	../gdispl -lib ../lib append.pl > results/append.txt
 	../gdispl -lib ../lib var.pl > results/var.txt
@@ -66,6 +70,8 @@ mkresults:
 	../gdispl -lib ../lib ../examples/list.pl > results/list.txt
 	../gdispl -lib ../lib ../examples/op.pl > results/op.txt
 	../gdispl -lib ../lib ../examples/macro.pl > results/macro.txt
+	swipl writeln2.pl > results/writeln2.txt
+	swipl repeat.pl > results/repeat.txt
 
 clean:
 	rm -rf result.txt
