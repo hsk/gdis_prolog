@@ -60,7 +60,7 @@ sudo make uninstall
 
 ## 2017/12/05 version 0.1.7
 
-* aaa
+* 挙動おかしいところのバグFix
 
 ## 2017/12/05 version 0.1.6
 

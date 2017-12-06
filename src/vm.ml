@@ -54,13 +54,12 @@ let pop m = match m with
 |   _,  d, _,              [] -> Fail d
 |   _,  d, _, ( g, _,_, i)::s -> Succ (g, d, i, s)
 let rec pop1 l1 d s = match s with
-| []->Fail d
-| (g,e,l,i)::s when l1=l -> pop1 l1 d s
+| []|[_]->Fail d
 | (g,e,l,i)::s -> Succ(g,d,0, s)
 
 let backtrack d s = match s with
-| []->Fail d
-| (_,e,l,i)::s -> pop1 l d s
+  | []->Fail d
+  | (_,e,l,i)::s -> pop1 l d s
 let uni m s t t2 =
   match unify (e s) t t2, m with
   | Some e, (_::g, d, _, (sg, _,l, i)::s) -> Succ (g, d, -1, (sg, e, l, i) :: s)

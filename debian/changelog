@@ -1,8 +1,8 @@
-gdis-prolog (0.1.7) UNRELEASED; urgency=medium
+gdis-prolog (0.1.7) zesty; urgency=medium
 
-  * 
+  * fix bug
 
- -- sakurai <sakurai777@gmail.com>  Tue, 05 Dec 2017 21:44:57 +0900
+ -- sakurai <sakurai777@gmail.com>  Tue, 06 Dec 2017 15:44:57 +0900
 
 gdis-prolog (0.1.6) zesty; urgency=medium
 
