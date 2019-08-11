@@ -58,6 +58,11 @@ sudo make uninstall
 
 # Change history
 
+## 2018/08/11 version 0.1.8
+
+* 久しぶりにバージョンだけ変更
+* 18.04で登録できたら嬉しい
+
 ## 2017/12/05 version 0.1.7
 
 * 挙動おかしいところのバグFix
